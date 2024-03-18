@@ -34,10 +34,40 @@
 	-Пользователь нажимает кнопку "ё" на клавиатуре.
 	-Приложение завершает игру и выводит статистику
 
+---------------------------------------------------------------------
+
+Новый персонаж:
+
 ```mermaid
-  graph TD;
-      A-->B;
-      A-->C;
-      B-->D;
-      C-->D;
+graph TD
+    Start((Начало)) --> UserChoice{Выбор опции}
+    UserChoice -- 1 --> EnterName[Ввод имени персонажа]
+    EnterName --> CheckName{Проверка имени}
+    CheckName -- Валидно --> Continue[Продолжение выполнения]
+    CheckName -- Невалидно --> EnterName
+    UserChoice -- 0 --> End((Конец))
+```
+
+Перемещение по подземелью
+
+```mermaid
+graph TD
+    Start((Начало)) --> UserInput{Нажатие клавиш}
+    UserInput -- Стрелка --> ProcessInput[Обработка ввода]
+    ProcessInput --> MoveCharacter[Перемещение персонажа]
+    MoveCharacter --> End((Конец))
+    UserInput -- Другая клавиша --> UserInput
+
+```
+
+Сбор монеток
+
+```mermaid
+graph TD
+    Start((Начало)) --> ApproachCoin{Подход к монетке}
+    ApproachCoin --> PressR{Нажатие клавиши R}
+    PressR --> CollectCoin[Подбор монетки]
+    CollectCoin --> UpdateStats[Обновление статистики]
+    UpdateStats --> End((Конец))
+    PressR -- Другая клавиша --> ApproachCoin
 ```
