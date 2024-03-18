@@ -34,77 +34,10 @@
 	-Пользователь нажимает кнопку "ё" на клавиатуре.
 	-Приложение завершает игру и выводит статистику
 
-@startuml
-
-left to right direction
-skinparam packageStyle rectangle
-
-actor Пользователь as User
-rectangle "Подземелье Приключений" {
-    usecase "Создание нового персонажа" as CreateCharacter
-    usecase "Перемещение по подземелью" as MoveCharacter
-    usecase "Сбор монеток" as CollectCoins
-    usecase "Обнаружение секретных комнат" as DiscoverSecretRooms
-    usecase "Завершение игры" as EndGame
-
-    User --> CreateCharacter
-    User --> MoveCharacter
-    User --> CollectCoins
-    User --> DiscoverSecretRooms
-    User --> EndGame
-}
-
-@enduml
-
-@startuml
-
-start
-:Пользователь запускает игру;
-:Пользователь выбирает опцию "Запустить игру" (1);
-if (Пользователь выбрал 1) then (yes)
-  :Пользователь вводит имя персонажа;
-  :Приложение принимает имя персонажа и продолжает выполнение;
-else (no)
-  :Пользователь завершает игру;
-endif
-stop
-
-@enduml
-
-
-@startuml
-
-start
-:Пользователь использует клавиши управления;
-:Приложение обрабатывает ввод пользователя и перемещает персонажа;
-stop
-
-@enduml
-
-
-@startuml
-
-start
-:Пользователь подходит к монетке;
-if (Пользователь нажал 'R') then (yes)
-  :Приложение увеличивает количество монеток у персонажа;
-  :Приложение выводит сообщение об увеличении количества монеток;
-else (no)
-  :Пользователь продолжает исследовать подземелье;
-endif
-stop
-
-@enduml
-
-@startuml
-
-start
-:Персонаж исследует подземелье;
-if (Персонаж обнаружил скрытую дверь) then (yes)
-  :Приложение выводит сообщение о нахождении скрытой комнаты;
-else (no)
-  :Персонаж продолжает исследовать подземелье;
-endif
-stop
-
-@enduml
+```mermaid
+  graph TD;
+      A-->B;
+      A-->C;
+      B-->D;
+      C-->D;
+```
