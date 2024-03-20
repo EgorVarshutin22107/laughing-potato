@@ -91,7 +91,7 @@ graph TD
     PressR -- Другая клавиша --> ApproachCoin
 ```
 
-*[оффлайн файл](diagrams/collecting_coins.puml)
+* [оффлайн файл](diagrams/collecting_coins.puml)
 ---------------------------------------------------------------------
 
 
@@ -109,7 +109,7 @@ stateDiagram
     Готов_к_началу --> [*]
 ```
 
-*[оффлайн файл](diagrams/new_person_sostoyanie.puml)
+* [оффлайн файл](diagrams/new_person_sostoyanie.puml)
 ---------------------------------------------------------------------
 
 **Перемещение по подземелью**
@@ -120,7 +120,7 @@ stateDiagram
     Перемещение --> Ожидание_ввода: Приложение перемещает персонажа
 ```
 
-*[оффлайн файл](diagrams/Navigating_the_Dungeon_sostoyanie.puml)
+* [оффлайн файл](diagrams/Navigating_the_Dungeon_sostoyanie.puml)
 ---------------------------------------------------------------------
 
 **Сбор монеток**
@@ -132,7 +132,7 @@ stateDiagram
     Сбор_монетки --> Ожидание_подхода: Приложение увеличивает количество монеток
 ```
 
-*[оффлайн файл](diagrams/collecting_coins_sostoyanie.puml)
+* [оффлайн файл](diagrams/collecting_coins_sostoyanie.puml)
 ---------------------------------------------------------------------
 
 
@@ -151,4 +151,4 @@ sequenceDiagram
     end
 ```
 
-*[оффлайн файл](diagrams/hidden_door_subsequence.puml)
+* [оффлайн файл](diagrams/hidden_door_subsequence.puml)
