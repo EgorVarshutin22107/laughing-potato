@@ -1,0 +1,9 @@
+@startuml
+graph TD
+    Start((Начало)) --> ApproachCoin{Подход к монетке}
+    ApproachCoin --> PressR{Нажатие клавиши R}
+    PressR --> CollectCoin[Подбор монетки]
+    CollectCoin --> UpdateStats[Обновление статистики]
+    UpdateStats --> End((Конец))
+    PressR -- Другая клавиша --> ApproachCoin
+@enduml

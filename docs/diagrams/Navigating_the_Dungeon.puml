@@ -1,0 +1,8 @@
+@startuml
+graph TD
+    Start((Начало)) --> UserInput{Нажатие клавиш}
+    UserInput -- Стрелка --> ProcessInput[Обработка ввода]
+    ProcessInput --> MoveCharacter[Перемещение персонажа]
+    MoveCharacter --> End((Конец))
+    UserInput -- Другая клавиша --> UserInput
+@enduml

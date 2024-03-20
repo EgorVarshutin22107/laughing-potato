@@ -1,0 +1,9 @@
+@startuml
+graph TD
+    Start((Начало)) --> UserChoice{Выбор опции}
+    UserChoice -- 1 --> EnterName[Ввод имени персонажа]
+    EnterName --> CheckName{Проверка имени}
+    CheckName -- Валидно --> Continue[Продолжение выполнения]
+    CheckName -- Невалидно --> EnterName
+    UserChoice -- 0 --> End((Конец))
+@enduml
