@@ -65,7 +65,10 @@ state if_state <<choice>>
 node1 --> node2
 node2 --> if_state
 if_state --> node3 : Да
-node3 --> node4
+node3 --> if_state
+if_state --> [*] : Нажата клавиша Enter
+node3 --> [*]
+if_state --> node3 : Не клавиша Enter
 if_state --> node2 : нет 
 
 ```
