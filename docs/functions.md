@@ -55,10 +55,10 @@
 
 ```mermaid
 graph TD;
-    Start((Начало)) --> InputName(Ввод имени персонажа)
+    |Начало| [*] --> InputName(Ввод имени персонажа)
     InputName -->|Нажата клавиша enter| CheckFormat(Проверка формата)
-    CheckFormat -->|Соответствует формату| End((Конец))
-    CheckFormat -->|Не соответствует формату| InputName
+    CheckFormat -->|Соответствует формату| [*]
+    CheckFormat -->|Не соответствует формату| [*]
 ```
 * [оффлайн файл](diagrams/new_person.puml)
 ---------------------------------------------------------------------
@@ -66,10 +66,10 @@ graph TD;
 
 ```mermaid
 graph TD;
-    Start((начало)) --> Move((пользователь нажимает клавишу управления))
-    Move -->|Нажата не клавиша управления| End
+    |Начало| [*] --> Move((пользователь нажимает клавишу управления))
+    Move -->|Нажата не клавиша управления| [*]
     Move -->|Нажата клавиша управления| CheckWall(Проверка обнаружения стены)
-    CheckWall -->|Обнаружена стена| End
+    CheckWall -->|Обнаружена стена| [*]
     CheckWall -->|Стены нет| MoveEnd((Персонаж двигается))
 ```
 
@@ -79,12 +79,12 @@ graph TD;
 
 ```mermaid
 graph TD;
-    Start((начало)) --> CheckCoin(Персонаж в зоне действия монетки?)
-    CheckCoin -->|Нет| End
+    |Начало| [*] --> CheckCoin(Персонаж в зоне действия монетки?)
+    CheckCoin -->|Нет| [*]
     CheckCoin -->|Да| CheckKeyPress(Пользователь нажал клавишу R?)
     CheckKeyPress -->|Да| CoinCollected((Монетка подбирается))
-    CheckKeyPress -->|Нет| End
-    CoinCollected --> End
+    CheckKeyPress -->|Нет| [*]
+    CoinCollected --> [*]
 ```
 
 * [оффлайн файл](diagrams/collecting_coins.puml)
