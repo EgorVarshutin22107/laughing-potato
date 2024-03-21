@@ -57,7 +57,7 @@
 stateDiagram-v2
 node1: Ввод имени персонажа
 node2: Проверка формата
-node3: Enter
+node3: Ожидание нажатия клавиши Enter
 state if_state <<choice>>
 
 
@@ -66,12 +66,8 @@ node1 --> node2
 node2 --> if_state
 if_state --> node3 : Да
 node3 --> node4
-if_state --> node5 : нет 
-node4 --> node6
-node5 --> node6
-node6 --> node7
-node7 --> node8
-node8 --> [*]
+if_state --> node2 : нет 
+
 ```
 * [оффлайн файл](diagrams/new_person.puml)
 ---------------------------------------------------------------------
