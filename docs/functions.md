@@ -54,27 +54,23 @@
 ### Новый персонаж:
 
 ```mermaid
-graph TD
-    Start((Начало)) --> UserChoice{Выбор опции}
-    UserChoice -- 1 --> EnterName[Ввод имени персонажа]
-    EnterName --> CheckName{Проверка имени}
-    CheckName -- Валидно --> Continue[Продолжение выполнения]
-    CheckName -- Невалидно --> EnterName
-    UserChoice -- 0 --> End((Конец))
+graph TD;
+    Start((Начало)) --> InputName(Ввод имени персонажа)
+    InputName -->|Нажата клавиша enter| CheckFormat(Проверка формата)
+    CheckFormat -->|Соответствует формату| End((Конец))
+    CheckFormat -->|Не соответствует формату| InputName
 ```
-
 * [оффлайн файл](diagrams/new_person.puml)
 ---------------------------------------------------------------------
 ### Перемещение по подземелью
 
 ```mermaid
-graph TD
-    Start((Начало)) --> UserInput{Нажатие клавиш}
-    UserInput -- Стрелка --> ProcessInput[Обработка ввода]
-    ProcessInput --> MoveCharacter[Перемещение персонажа]
-    MoveCharacter --> End((Конец))
-    UserInput -- Другая клавиша --> UserInput
-
+graph TD;
+    Start((начало)) --> Move((пользователь нажимает клавишу управления))
+    Move -->|Нажата не клавиша управления| End
+    Move -->|Нажата клавиша управления| CheckWall(Проверка обнаружения стены)
+    CheckWall -->|Обнаружена стена| End
+    CheckWall -->|Стены нет| MoveEnd((Персонаж двигается))
 ```
 
 * [оффлайн файл](diagrams/Navigating_the_Dungeon.puml)
@@ -82,13 +78,13 @@ graph TD
 ### Сбор монеток
 
 ```mermaid
-graph TD
-    Start((Начало)) --> ApproachCoin{Подход к монетке}
-    ApproachCoin --> PressR{Нажатие клавиши R}
-    PressR --> CollectCoin[Подбор монетки]
-    CollectCoin --> UpdateStats[Обновление статистики]
-    UpdateStats --> End((Конец))
-    PressR -- Другая клавиша --> ApproachCoin
+graph TD;
+    Start((начало)) --> CheckCoin(Персонаж в зоне действия монетки?)
+    CheckCoin -->|Нет| End
+    CheckCoin -->|Да| CheckKeyPress(Пользователь нажал клавишу R?)
+    CheckKeyPress -->|Да| CoinCollected((Монетка подбирается))
+    CheckKeyPress -->|Нет| End
+    CoinCollected --> End
 ```
 
 * [оффлайн файл](diagrams/collecting_coins.puml)
