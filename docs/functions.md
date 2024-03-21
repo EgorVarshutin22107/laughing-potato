@@ -56,20 +56,19 @@
 ```mermaid
 stateDiagram-v2
 node1: Ввод имени персонажа
-node2: Проверка формата
-node3: Ожидание нажатия клавиши Enter
-state if_state <<choice>>
-
+node2: Ожидание нажатия клавиши Enter
+node3: Проверка формата
+state if_state1 <<choice>>
+state if_state2 <<choice>>
 
 [*] --> node1
 node1 --> node2
-node2 --> if_state
-if_state --> node3 : Да
-if_state --> node2 : нет
-node3 --> if_state
-if_state --> [*] : Нажат enter
-if_state --> node3 : Не enter
-
+node2 --> if_state1
+if_state1 --> node3 : Нажат enter
+if_state1 --> node2 : Не enter
+node3 --> if_state2
+if_state2 --> [*] : Валидно
+if_state2 --> node1 : Не валидно
 ```
 * [оффлайн файл](diagrams/new_person.puml)
 ---------------------------------------------------------------------
