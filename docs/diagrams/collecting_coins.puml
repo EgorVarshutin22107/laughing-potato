@@ -1,9 +1,0 @@
-@startuml
-graph TD;
-    Start((начало)) --> CheckCoin(Персонаж в зоне действия монетки?)
-    CheckCoin -->|Нет| End
-    CheckCoin -->|Да| CheckKeyPress(Пользователь нажал клавишу R?)
-    CheckKeyPress -->|Да| CoinCollected((Монетка подбирается))
-    CheckKeyPress -->|Нет| End
-    CoinCollected --> End
-@enduml

@@ -1,7 +1,0 @@
-@startuml
-graph TD;
-    Start((Начало)) --> InputName(Ввод имени персонажа)
-    InputName -->|Нажата клавиша enter| CheckFormat(Проверка формата)
-    CheckFormat -->|Соответствует формату| End((Конец))
-    CheckFormat -->|Не соответствует формату| InputName
-@enduml
