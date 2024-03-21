@@ -1,9 +1,7 @@
 @startuml
-graph TD
-    Start((Начало)) --> UserChoice{Выбор опции}
-    UserChoice -- 1 --> EnterName[Ввод имени персонажа]
-    EnterName --> CheckName{Проверка имени}
-    CheckName -- Валидно --> Continue[Продолжение выполнения]
-    CheckName -- Невалидно --> EnterName
-    UserChoice -- 0 --> End((Конец))
+graph TD;
+    Start((Начало)) --> InputName(Ввод имени персонажа)
+    InputName -->|Нажата клавиша enter| CheckFormat(Проверка формата)
+    CheckFormat -->|Соответствует формату| End((Конец))
+    CheckFormat -->|Не соответствует формату| InputName
 @enduml

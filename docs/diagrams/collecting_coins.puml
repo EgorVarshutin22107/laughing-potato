@@ -1,9 +1,9 @@
 @startuml
-graph TD
-    Start((Начало)) --> ApproachCoin{Подход к монетке}
-    ApproachCoin --> PressR{Нажатие клавиши R}
-    PressR --> CollectCoin[Подбор монетки]
-    CollectCoin --> UpdateStats[Обновление статистики]
-    UpdateStats --> End((Конец))
-    PressR -- Другая клавиша --> ApproachCoin
+graph TD;
+    Start((начало)) --> CheckCoin(Персонаж в зоне действия монетки?)
+    CheckCoin -->|Нет| End
+    CheckCoin -->|Да| CheckKeyPress(Пользователь нажал клавишу R?)
+    CheckKeyPress -->|Да| CoinCollected((Монетка подбирается))
+    CheckKeyPress -->|Нет| End
+    CoinCollected --> End
 @enduml

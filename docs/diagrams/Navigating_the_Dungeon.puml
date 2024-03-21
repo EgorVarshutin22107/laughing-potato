@@ -1,8 +1,8 @@
 @startuml
-graph TD
-    Start((Начало)) --> UserInput{Нажатие клавиш}
-    UserInput -- Стрелка --> ProcessInput[Обработка ввода]
-    ProcessInput --> MoveCharacter[Перемещение персонажа]
-    MoveCharacter --> End((Конец))
-    UserInput -- Другая клавиша --> UserInput
+graph TD;
+    Start((начало)) --> Move((пользователь нажимает клавишу управления))
+    Move -->|Нажата не клавиша управления| End
+    Move -->|Нажата клавиша управления| CheckWall(Проверка обнаружения стены)
+    CheckWall -->|Обнаружена стена| End
+    CheckWall -->|Стены нет| MoveEnd((Персонаж двигается))
 @enduml
