@@ -54,11 +54,19 @@
 ### Новый персонаж:
 
 ```mermaid
-graph TD;
-    |Начало| [*] --> InputName(Ввод имени персонажа)
-    InputName -->|Нажата клавиша enter| CheckFormat(Проверка формата)
-    CheckFormat -->|Соответствует формату| [*]
-    CheckFormat -->|Не соответствует формату| [*]
+stateDiagram-v2
+node1: Ввод имени персонажа
+node2: Проверка формата
+node3: Enter
+state if_state <<choice>>
+
+[*] --> node1
+node1 --> node2
+node2 --> if state
+if_state --> node3 : Проверку прошел
+node3 --> [*]
+if_state --> node2 : Проверку не прошел
+
 ```
 * [оффлайн файл](diagrams/new_person.puml)
 ---------------------------------------------------------------------
