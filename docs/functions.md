@@ -65,11 +65,10 @@ state if_state <<choice>>
 node1 --> node2
 node2 --> if_state
 if_state --> node3 : Да
+if_state --> node2 : нет
 node3 --> if_state
-if_state --> [*] : Нажата клавиша Enter
-node3 --> [*]
-if_state --> node3 : Не клавиша Enter
-if_state --> node2 : нет 
+if_state --> [*] : Нажат enter
+if_state --> node3 : Не enter
 
 ```
 * [оффлайн файл](diagrams/new_person.puml)
