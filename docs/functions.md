@@ -75,12 +75,19 @@ if_state2 --> node1 : Не валидно
 ### Перемещение по подземелью
 
 ```mermaid
-graph TD;
-    |Начало| [*] --> Move((пользователь нажимает клавишу управления))
-    Move -->|Нажата не клавиша управления| [*]
-    Move -->|Нажата клавиша управления| CheckWall(Проверка обнаружения стены)
-    CheckWall -->|Обнаружена стена| [*]
-    CheckWall -->|Стены нет| MoveEnd((Персонаж двигается))
+stateDiagram-v2
+node1: Нажатие клавиши управления
+node2: Есть ли преграда?
+state if_state1 <<choice>>
+state if_state2 <<choice>>
+
+[*] --> node1 
+node1 --> if_state1
+if_state1 --> node1 : Не клавиша управления
+if_state1 --> node2 : Клавиша управления
+node2 --> if_state2
+if_state2 --> [*] : Преграда не обнаружена
+if_state2 --> node1 : Обнаружена преграда
 ```
 
 
@@ -88,13 +95,21 @@ graph TD;
 ### Сбор монеток
 
 ```mermaid
-graph TD;
-    |Начало| [*] --> CheckCoin(Персонаж в зоне действия монетки?)
-    CheckCoin -->|Нет| [*]
-    CheckCoin -->|Да| CheckKeyPress(Пользователь нажал клавишу R?)
-    CheckKeyPress -->|Да| CoinCollected((Монетка подбирается))
-    CheckKeyPress -->|Нет| [*]
-    CoinCollected --> [*]
+stateDiagram-v2
+node1: Пользователь в зоне действия монетки?
+node2: Ожидание нажатия клавиши "R"
+node3: Запись в счетчик монет
+state if_state1 <<choice>>
+state if_state2 <<choice>>
+
+[*] --> node1 
+node1 --> if_state1
+if_state1 --> node2 : В зоне действия монетки
+if_state1 --> [*] : Не в зоне действия монетки
+node2 --> if_state2
+if_state2 --> node2 : Нажата не клавиша "R"
+if_state2 --> node3 : Нажата клавиша "R"
+node3 --> [*] 
 ```
 
 
