@@ -123,11 +123,23 @@ node3 --> [*]
 **Создание нового персонажа**
 
 ```mermaid
-stateDiagram
-    [*] --> Запуск_игры
-    Запуск_игры --> Ввод_имени: Пользователь выбирает "Запустить игру" и вводит 1
-    Ввод_имени --> Готов_к_началу: Пользователь вводит имя персонажа
-    Готов_к_началу --> [*]
+stateDiagram-v2
+node1: Запуск игры
+node2: Пользователь запустил игру?
+node3: Ввод имени
+node4: Начало
+state if_state <<choice>>
+state if_state2 <<choice>>
+
+[*] --> node1
+node1 --> node2
+node2 --> if_state
+if_state --> [*]: Нет
+if_state --> node3: Да
+node3 --> if_state2
+if_state2 --> node4: Ввел
+node4 --> [*]
+if_state2 --> node3: Не ввел/Не валидно
 ```
 
 
@@ -135,22 +147,51 @@ stateDiagram
 
 **Перемещение по подземелью**
 ```mermaid
-stateDiagram
-    [*] --> Ожидание_ввода
-    Ожидание_ввода --> Перемещение: Пользователь нажимает стрелочные клавиши
-    Перемещение --> Ожидание_ввода: Приложение перемещает персонажа
+stateDiagram-v2
+node1: Ввод
+node2: Стрелочная клавиша?
+node3: Есть место для перемещения?
+node4: Перемещение
+state if_state <<choice>>
+
+[*] --> node1
+node1 --> node2
+node2 --> if_state
+if_state --> node1: Нет
+if_state --> node3: Да
+node3 --> node4: да
+node3 --> node1: нет
+node4 --> [*]
+
 ```
 
 
 ---------------------------------------------------------------------
 
-**Сбор монеток**
+**Gameplay**
 ```mermaid
-stateDiagram
-    [*] --> Ожидание_подхода
-    Ожидание_подхода --> Ожидание_нажатия_R: Пользователь подходит к монетке
-    Ожидание_нажатия_R --> Сбор_монетки: Пользователь нажимает клавишу "R"
-    Сбор_монетки --> Ожидание_подхода: Приложение увеличивает количество монеток
+stateDiagram-v2
+node1: Старт игры
+node2: В игре
+node3: Нахождение монетки
+node4: Сбор монетки
+node5: Конец игры
+node6: Запуск таймера
+node7: Таймер закончился?
+state if_state <<choice>>
+state if_state2 <<choice>>
+    [*] --> node1
+    node1 --> node6
+    node6 --> if_state
+    if_state --> node7
+    node7 --> node2: нет
+    node7 --> node5: да
+    node2 --> node3
+    node3 --> node4
+    node4 --> if_state2: собрали монетки?
+    if_state2 --> [*]: да
+    if_state2 --> node7: нет
+    node5 --> [*]
 ```
 
 
@@ -162,12 +203,21 @@ stateDiagram
 **Обнаружение скрытой двери**
 ```mermaid
 sequenceDiagram
-    participant User as Пользователь
-    participant App as Приложение
-    User->>App: Исследование подземелья
-    alt Обнаружена_дверь
-    App->>User: Сообщение о скрытой двери
-    else Нет_двери
-    App->>User: Ничего не обнаружено
-    end
+actor student as Студент
+participant character as Персонаж
+participant door as Скрытая дверь
+
+alt Обнаружена
+    student->>character: Управление персонажем
+    character->>door: Зашел в зону появления надписи о скрытой двери
+    door->>student: Вылезает надпись "Обнаружена скрытая дверь"
+    character->>door: Заходит в скрытую дверь
+    door->>character: Перемещает на другю локацию
+    character->>door: Не зашел в зону действия скрытой двери
+end
+
+alt Не обнаружена
+    door->>student: Ничего не выводит
+    character->>door: Не может войти никуда
+end
 ```
