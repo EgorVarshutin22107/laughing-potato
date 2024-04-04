@@ -46,14 +46,6 @@ classDiagram
         + run()
     }
 
-    note for Character "Персонаж, которым управляет пользователь"
-    note for LevelGenerator "Создает случайные уровни подземелий для исследования"
-    note for GameEngine "Отвечает за инициализацию и управление игровым процессом"
-    note for Timer "Отслеживает время игры и оповещает об окончании времени"
-    note for Rendering "Отвечает за отображение игрового мира и интерфейса пользователя"
-    note for InputManager "Обрабатывает ввод пользователя с клавиатуры"
-    note for GameStats "Собирает и отображает статистическую информацию о текущей игре"
-    note for MainApplicationClass "Инициализирует все компоненты приложения и управляет их взаимодействием"
     GameEngine --|> LevelGenerator
     GameEngine --|> Character
     GameEngine --|> Rendering
