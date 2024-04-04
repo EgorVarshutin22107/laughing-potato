@@ -1,60 +1,59 @@
+# Структурные модели
+----------------------------------------
+
+## Описание внутренней структуры приложения
+
 ```mermaid
 ---
 title: Подземелье Приключений
 ---
-
 classDiagram 
     class GameEngine {
         + initializeGame()
         + startGame()
         + update()
         + render()
-        - int currentLevel
-        - bool gameRunning
     }
     class LevelGenerator {
         + generateLevel()
         + placeCoins()
         + placeSecretRooms()
-        - int numberOfRooms
-        - int numberOfCoins
     }
     class Character {
         + move()
         + collectCoin()
         + detectSecretRoom()
-        - int healthPoints
-        - int coinsCollected
     }
     class Timer {
         + startTimer()
         + stopTimer()
         + checkTimeLimit()
-        - int timeElapsed
-        - int timeLimit
     }
     class Rendering {
         + drawLevel()
         + drawCharacter()
         + drawUI()
-        - bool UIEnabled
     }
     class InputManager {
         + handleKeyPress()
-        - bool keyPressed
     }
     class GameStats {
         + updateCoinCount()
         + displayStats()
-        - int coinsCollected
-        - int enemiesDefeated
     }
     class MainApplicationClass {
         + initialize()
         + run()
-        - string version
     }
 
+    note for Character "Персонаж, которым управляет пользователь"
+    note for LevelGenerator "Создает случайные уровни подземелий для исследования"
+    note for GameEngine "Отвечает за инициализацию и управление игровым процессом"
+    note for Timer "Отслеживает время игры и оповещает об окончании времени"
+    note for Rendering "Отвечает за отображение игрового мира и интерфейса пользователя"
+    note for InputManager "Обрабатывает ввод пользователя с клавиатуры"
+    note for GameStats "Собирает и отображает статистическую информацию о текущей игре"
+    note for MainApplicationClass "Инициализирует все компоненты приложения и управляет их взаимодействием"
     GameEngine --|> LevelGenerator
     GameEngine --|> Character
     GameEngine --|> Rendering
@@ -64,4 +63,5 @@ classDiagram
     Character --|> GameStats
     MainApplicationClass --|> GameEngine
     MainApplicationClass --|> InputManager
+
 ```
