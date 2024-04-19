@@ -99,3 +99,28 @@ classDiagram
 - `Character` взаимодействует с `GameStats`, чтобы обновить количество собранных монет и отобразить статистику на экране.
   - `updateCoinCount()`: Обновляет количество собранных монет персонажем.
   - `displayStats()`: Отображает статистику игры, например, количество собранных монет и время игры.
+
+```mermaid
+objectDiagram
+    gameStats : GameStats
+    character : Character
+    timer : Timer
+    levelGenerator : LevelGenerator
+    point : Point
+    direction : Direction
+    goodCoin : Coin
+    badCoin : Coin
+    coinType : CoinType
+
+    gameStats <.. game : contains
+    character <.. game : contains
+    timer <.. game : contains
+    levelGenerator <.. game : contains
+    point <.. character : contains
+    direction <.. character : contains
+    goodCoin <.. character : contains
+    badCoin <.. character : contains
+    coinType <.. goodCoin : contains
+    coinType <.. badCoin : contains
+
+```
