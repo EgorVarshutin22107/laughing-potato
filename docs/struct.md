@@ -133,3 +133,49 @@ classDiagram
 				Количество собранных монет
 				Время игры
 
+## Диаграмма обьектов 
+
+```mermaid
+sequenceDiagram
+    participant MainApp as MainApplicationClass
+    participant Engine as GameEngine
+    participant LevelGen as LevelGenerator
+    participant Character
+    participant InputMgr as InputManager
+    participant Rendering
+    participant Timer
+    participant GameStats
+
+    MainApp->>Engine: initialize()
+    MainApp->>Engine: run()
+    Engine->>Engine: initializeGame()
+    Engine->>Engine: startGame()
+    Engine->>Timer: funcTimer()
+    Engine->>GameStats: displayStats()
+    Engine->>Character: move()
+    Character->>InputMgr: handleKeyPress()
+    Engine->>Character: collectCoin()
+    Character->>Engine: updateCoinCount()
+    Character->>GameStats: updateCoinCount()
+    Character->>Rendering: drawCharacter()
+    Engine->>Character: detectSecretRoom()
+    Character->>GameStats: displayStats()
+    Engine->>LevelGen: generateLevel()
+    LevelGen->>Engine: generateLevel()
+    LevelGen->>Engine: placeCoins()
+    LevelGen->>Engine: placeSecretRooms()
+    Engine->>Rendering: drawLevel()
+    Rendering->>LevelGen: drawLevel()
+    Rendering->>Character: drawCharacter()
+    Rendering->>Rendering: drawUI()
+```
+
+Взаимодействие начинается с инициализации и запуска приложения, когда `MainApplicationClass` вызывает методы `initialize()` и `run()`. Затем `GameEngine` инициализирует и запускает игру, что включает в себя генерацию уровня (`LevelGenerator`), начало отсчёта времени (`Timer`), инициализацию статистики (`GameStats`) и обработку действий персонажа (`Character`).
+
+Персонаж (`Character`) взаимодействует с менеджером ввода (`InputManager`), чтобы обрабатывать пользовательский ввод, а также с `GameStats` для обновления счетчика монет и отображения статистики. 
+
+Генератор уровней (`LevelGenerator`) предоставляет информацию о созданном уровне `GameEngine`, который в свою очередь передает эту информацию `Rendering` для отображения уровня на экране, включая расположение монет и секретных комнат.
+
+`Rendering` отвечает за отображение элементов игры на экране, включая персонажа, уровень и интерфейс пользователя. 
+
+Время игры отслеживается через `Timer`, а статистика игры (например, количество собранных монет) обновляется и отображается с помощью `GameStats`.
