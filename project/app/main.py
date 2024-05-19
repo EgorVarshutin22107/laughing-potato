@@ -46,13 +46,16 @@ class Wall:
 # Класс для генерации лабиринта
 class Maze:
     def __init__(self, width, height):
+        if width <= 0 or height <= 0:
+            raise ValueError("Invalid maze size")
         self.width = width
         self.height = height
         self.grid = self.generate_maze()
 
     def generate_maze(self):
+        if self.width < 3 or self.height < 3:
+            raise ValueError("Maze size too small")
         maze = [[1] * self.width for _ in range(self.height)]
-        
         def carve_passages_from(cx, cy):
             directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
             random.shuffle(directions)
@@ -62,7 +65,6 @@ class Maze:
                     maze[cy + direction[1]][cx + direction[0]] = 0
                     maze[ny][nx] = 0
                     carve_passages_from(nx, ny)
-                    
         maze[1][1] = 0
         carve_passages_from(1, 1)
         return maze

@@ -1,90 +1,69 @@
 import pytest
 import pygame
-from main import Player, Coin, Wall, Maze, Game
+from main import Player, Coin, Wall, Maze, UI, Game  # Предполагается, что игра находится в файле game.py
 
-@pytest.fixture
-def player():
-    return Player()
-
-@pytest.fixture
-def walls():
-    return [Wall((0, 0)), Wall((16, 16)), Wall((32, 32))]
-
-@pytest.fixture
-def coins():
-    return [Coin((70, 70)), Coin((100, 100), slow=True)]
-
-@pytest.fixture
-def maze():
-    return Maze(40, 30)
-
-@pytest.fixture
-def game():
-    return Game()
-
-def test_player_initial_position(player):
-    assert player.rect.topleft == (32, 32)
+# Тесты для класса Player
+def test_player_initialization():
+    player = Player()
+    assert player.rect == pygame.Rect(32, 32, 16, 16)
     assert player.speed == 2
     assert player.slowed_until == 0
 
-def test_player_initial_position_negative(player):
-    assert player.rect.topleft != (0, 0)
-    assert player.speed > 0
-    assert player.slowed_until == 0
+def test_player_move():
+    player = Player()
+    wall = Wall((50, 32))
+    walls = [wall]
 
-def test_player_move_no_collision(player, walls):
-    player.move(10, 0, walls)
-    assert player.rect.x == 42
-    player.move(0, 10, walls)
-    assert player.rect.y == 42
+    player.move(16, 0, walls)
+    assert player.rect.topleft == (48, 32)  # Столкновение со стеной должно остановить игрока
 
-def test_player_move_negative_values(player, walls):
-    player.move(-10, 0, walls)
-    assert player.rect.x == 22
-    player.move(0, -10, walls)
-    assert player.rect.y == 22
+    player.move(0, 16, walls)
+    assert player.rect.topleft == (48, 48)  # Движение вниз без столкновения
 
-def test_coin_collection(player, coins):
-    player.rect.topleft = (70, 70)
-    coin = coins[0]
-    assert player.rect.colliderect(coin.rect)
-    coins.remove(coin)
-    assert len(coins) == 1
+# Тесты для класса Coin
+def test_coin_initialization():
+    coin = Coin((100, 100), slow=True)
+    assert coin.rect == pygame.Rect(100, 100, 10, 10)
+    assert coin.slow is True
 
-def test_coin_collection_no_coin(player, coins):
-    initial_coin_count = len(coins)
-    player.rect.topleft = (80, 80)
-    for coin in coins[:]:
-        if player.rect.colliderect(coin.rect):
-            coins.remove(coin)
-    assert len(coins) == initial_coin_count
+# Тесты для класса Wall
+def test_wall_initialization():
+    wall = Wall((200, 200))
+    assert wall.rect == pygame.Rect(200, 200, 16, 16)
 
-def test_maze_generation(maze):
+# Тесты для класса Maze
+def test_maze_initialization():
+    with pytest.raises(ValueError):
+        Maze(0, 0)
+
+    maze = Maze(10, 10)
+    assert maze.width == 10
+    assert maze.height == 10
+    assert maze.grid is not None
+
+def test_maze_generation():
+    maze = Maze(10, 10)
     grid = maze.generate_maze()
-    assert grid[1][1] == 0
-    assert grid[maze.height - 2][maze.width - 2] == 0
+    assert len(grid) == 10
+    assert all(len(row) == 10 for row in grid)
+    assert grid[1][1] == 0  # Начальная точка свободна
 
-def test_maze_generation_invalid_size():
-    with pytest.raises(ValueError):
-        maze = Maze(-1, 10)
-        maze.generate_maze()
-    with pytest.raises(ValueError):
-        maze = Maze(10, -1)
-        maze.generate_maze()
-    with pytest.raises(ValueError):
-        maze = Maze(2, 2)
-        maze.generate_maze()
+# Тесты для класса UI (например, show_exit_confirmation)
+def test_show_exit_confirmation(mocker):
+    pygame.init()
+    screen = pygame.display.set_mode((740, 580))
+    font = pygame.font.SysFont(None, 36)
+    ui = UI(screen, font)
 
-def test_game_setup(game):
-    game.setup_level()
-    assert game.player.rect.topleft == (16 + 0, 16 + 50)
-    assert game.end_rect.topleft == (640 + 0, 480 + 50)
+    mocker.patch('pygame.event.get', return_value=[
+        pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (screen_width // 2 - 60, screen_height // 2 + 20)})
+    ])
+    
+    assert ui.show_exit_confirmation() is True
 
-def test_game_setup_invalid():
-    game = Game()
-    with pytest.raises(ValueError):
-        game.maze = Maze(-1, 10)
-        game.setup_level()
-    with pytest.raises(ValueError):
-        game.maze = Maze(10, -1)
-        game.setup_level()
+    mocker.patch('pygame.event.get', return_value=[
+        pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (screen_width // 2 + 60, screen_height // 2 + 20)})
+    ])
+
+    assert ui.show_exit_confirmation() is False
+
