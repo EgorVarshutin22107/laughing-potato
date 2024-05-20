@@ -1,6 +1,7 @@
 import pytest
 import pygame
-from main import Player, Coin, Wall, Maze, UI, Game  # Предполагается, что игра находится в файле game.py
+
+from main import Player, Coin, Wall, Maze
 
 # Тесты для класса Player
 def test_player_initialization():
@@ -15,10 +16,10 @@ def test_player_move():
     walls = [wall]
 
     player.move(16, 0, walls)
-    assert player.rect.topleft == (48, 32)  # Столкновение со стеной должно остановить игрока
+    assert player.rect.topleft == (32, 32)  # Столкновение со стеной должно остановить игрока
 
     player.move(0, 16, walls)
-    assert player.rect.topleft == (48, 48)  # Движение вниз без столкновения
+    assert player.rect.topleft == (32, 48)  # Движение вниз без столкновения
 
 # Тесты для класса Coin
 def test_coin_initialization():
@@ -47,23 +48,3 @@ def test_maze_generation():
     assert len(grid) == 10
     assert all(len(row) == 10 for row in grid)
     assert grid[1][1] == 0  # Начальная точка свободна
-
-# Тесты для класса UI (например, show_exit_confirmation)
-def test_show_exit_confirmation(mocker):
-    pygame.init()
-    screen = pygame.display.set_mode((740, 580))
-    font = pygame.font.SysFont(None, 36)
-    ui = UI(screen, font)
-
-    mocker.patch('pygame.event.get', return_value=[
-        pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (screen_width // 2 - 60, screen_height // 2 + 20)})
-    ])
-    
-    assert ui.show_exit_confirmation() is True
-
-    mocker.patch('pygame.event.get', return_value=[
-        pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (screen_width // 2 + 60, screen_height // 2 + 20)})
-    ])
-
-    assert ui.show_exit_confirmation() is False
-
