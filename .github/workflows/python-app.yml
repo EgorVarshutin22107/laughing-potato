@@ -1,7 +1,7 @@
 name: CI/CD GitHub Actions
 on: [push]
 jobs:
-  gtest-tests:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -11,4 +11,4 @@ jobs:
       - run: git submodule update
       - run: pip install --user cpp-coveralls
       - run: sudo apt-get update -y && sudo apt-get install -y qt5-qmake qtbase5-dev qtchooser qtbase5-dev-tools
-      - run: ./app/test.py
+      - run: ./app/test
