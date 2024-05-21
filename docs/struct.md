@@ -88,3 +88,133 @@ classDiagram
 - Game вызывает методы Player для перемещения игрока, Maze для генерации лабиринта, UI для отображения интерфейса.
 - Player проверяет столкновения с элементами лабиринта (стены, монеты).
 - UI показывает пользователю информацию о текущем состоянии игры и обрабатывает пользовательский ввод для подтверждения выхода или выбора в главном меню.
+
+
+## Диаграмма объектов
+
+```mermaid
+classDiagram
+    class Player {
+        +Rect rect : pygame.Rect
+        +int speed = 2
+        +float slowed_until = 0
+        +void move(int dx, int dy, list~Wall~ walls)
+        +void move_single_axis(int dx, int dy, list~Wall~ walls)
+    }
+
+    class Coin {
+        +Rect rect : pygame.Rect
+        +bool slow = false
+    }
+
+    class Wall {
+        +Rect rect : pygame.Rect
+    }
+
+    class Maze {
+        +int width
+        +int height
+        +list~list~int~~ grid
+        +list~list~int~~ generate_maze()
+        +void carve_passages_from(int cx, int cy)
+    }
+
+    class UI {
+        +Surface screen : pygame.Surface
+        +Font font : pygame.font.Font
+        +void show_statistics(int coin_count, float elapsed_time : seconds)
+        +bool show_exit_confirmation() : bool
+        +string show_main_menu() : string
+    }
+
+    class Game {
+        -int screen_width = 740
+        -int screen_height = 580
+        -int maze_offset_x = 0
+        -int maze_offset_y = 50
+        -Surface screen : pygame.Surface
+        -Clock clock : pygame.time.Clock
+        -Font font : pygame.font.Font
+        -UI ui
+        -list~Wall~ walls
+        -Player player
+        -list~Coin~ coins
+        -Maze maze
+        -Rect end_rect : pygame.Rect
+        -int coin_count = 0
+        -int max_time = 120 : seconds
+        +void setup_level()
+        +void run()
+    }
+
+    Game --> Player
+    Game --> Wall
+    Game --> Coin
+    Game --> Maze
+    Game --> UI
+
+    UI --> Surface
+    UI --> Font
+
+    Maze --> Wall
+```
+---
+
+Описание диаграммы:
+
+---
+
+### Player
+
+- **rect**: `pygame.Rect` - Позиция и размеры игрока.
+- **speed**: `int` = 2 - Скорость движения игрока.
+- **slowed_until**: `float` = 0 - Время, до которого игрок замедлен.
+- **move(int dx, int dy, list~Wall~ walls)** - Метод для перемещения игрока.
+- **move_single_axis(int dx, int dy, list~Wall~ walls)** - Метод для перемещения по одной оси.
+
+### Coin
+
+- **rect**: `pygame.Rect` - Позиция и размеры монеты.
+- **slow**: `bool` = false - Флаг, указывающий, замедляет ли эта монета игрока.
+
+### Wall
+
+- **rect**: `pygame.Rect` - Позиция и размеры стены.
+
+### Maze
+
+- **width**: `int` - Ширина лабиринта.
+- **height**: `int` - Высота лабиринта.
+- **grid**: `list[list[int]]` - Двумерный массив, представляющий структуру лабиринта.
+- **generate_maze()**: `list[list[int]]` - Метод для генерации лабиринта.
+- **carve_passages_from(int cx, int cy)** - Метод для создания проходов в лабиринте.
+
+### UI
+
+- **screen**: `pygame.Surface` - Экран для отображения интерфейса.
+- **font**: `pygame.font.Font` - Шрифт для отображения текста.
+- **show_statistics(int coin_count, float elapsed_time: seconds)** - Метод для отображения статистики.
+- **show_exit_confirmation()**: `bool` - Метод для подтверждения выхода.
+- **show_main_menu()**: `string` - Метод для отображения главного меню.
+
+### Game
+
+- **screen_width**: `int` = 740 - Ширина экрана.
+- **screen_height**: `int` = 580 - Высота экрана.
+- **maze_offset_x**: `int` = 0 - Горизонтальное смещение лабиринта.
+- **maze_offset_y**: `int` = 50 - Вертикальное смещение лабиринта.
+- **screen**: `pygame.Surface` - Экран для отображения игры.
+- **clock**: `pygame.time.Clock` - Часы для управления временем игры.
+- **font**: `pygame.font.Font` - Шрифт для отображения текста.
+- **ui**: `UI` - Интерфейс игры.
+- **walls**: `list[Wall]` - Список стен лабиринта.
+- **player**: `Player` - Игрок.
+- **coins**: `list[Coin]` - Список монет в лабиринте.
+- **maze**: `Maze` - Лабиринт.
+- **end_rect**: `pygame.Rect` - Позиция и размеры конечной точки лабиринта.
+- **coin_count**: `int` = 0 - Счетчик собранных монет.
+- **max_time**: `int` = 120 (seconds) - Максимальное время игры (в секундах).
+- **setup_level()** - Метод для настройки уровня.
+- **run()** - Метод для запуска игры.
+
+---
