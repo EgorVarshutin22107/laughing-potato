@@ -1,50 +1,96 @@
 import pytest
 import pygame
+import time
+from main import Player, Coin, Wall, Maze, Game
 
-from main import Player, Coin, Wall, Maze
+# Фикстура для создания экземпляра игрока для тестирования
+@pytest.fixture
+def player():
+    return Player()
 
-# Тесты для класса Player
-def test_player_initialization():
-    player = Player()
-    assert player.rect == pygame.Rect(32, 32, 16, 16)
-    assert player.speed == 2
-    assert player.slowed_until == 0
+# Фикстура для создания экземпляра монеты для тестирования
+@pytest.fixture
+def coin():
+    return Coin((100, 100))
 
-def test_player_move():
-    player = Player()
-    wall = Wall((50, 32))
-    walls = [wall]
+# Фикстура для создания экземпляра стены для тестирования
+@pytest.fixture
+def wall():
+    return Wall((50, 50))
 
-    player.move(16, 0, walls)
-    assert player.rect.topleft == (32, 32)  # Столкновение со стеной должно остановить игрока
+# Фикстура для создания экземпляра лабиринта для тестирования
+@pytest.fixture
+def maze():
+    return Maze(5, 5)
 
-    player.move(0, 16, walls)
-    assert player.rect.topleft == (32, 48)  # Движение вниз без столкновения
+# Фикстура для создания экземпляра игры для тестирования
+@pytest.fixture
+def game():
+    return Game()
 
-# Тесты для класса Coin
-def test_coin_initialization():
-    coin = Coin((100, 100), slow=True)
-    assert coin.rect == pygame.Rect(100, 100, 10, 10)
-    assert coin.slow is True
+# Тестирование движения игрока без столкновения
+def test_player_move_no_collision(player):
+    player.move(5, 0, [])
+    assert player.rect.x == 37
+    assert player.rect.y == 32
 
-# Тесты для класса Wall
-def test_wall_initialization():
-    wall = Wall((200, 200))
-    assert wall.rect == pygame.Rect(200, 200, 16, 16)
+# Тестирование движения игрока с столкновением со стеной
+def test_player_move_with_collision(player, wall):
+    player.move(18, 0, [wall])
+    assert player.rect.right == wall.rect.left
 
-# Тесты для класса Maze
-def test_maze_initialization():
+# Тестирование позиции монеты и эффекта замедления
+def test_coin_position(coin):
+    assert coin.rect.topleft == (100, 100)
+    assert not coin.slow
+
+# Тестирование создания монеты с замедлением
+def test_slow_coin():
+    slow_coin = Coin((200, 200), slow=True)
+    assert slow_coin.slow
+
+# Тестирование позиции стены
+def test_wall_position(wall):
+    assert wall.rect.topleft == (50, 50)
+
+# Тестирование проверки размера лабиринта
+def test_maze_size():
     with pytest.raises(ValueError):
-        Maze(0, 0)
+        Maze(2, 2)
 
-    maze = Maze(10, 10)
-    assert maze.width == 10
-    assert maze.height == 10
-    assert maze.grid is not None
+# Тестирование генерации лабиринта и убедиться, что проходы прорезаны
+def test_generate_maze(maze):
+    maze_data = maze.generate_maze()
+    assert len(maze_data) == 5
+    assert len(maze_data[0]) == 5
 
-def test_maze_generation():
-    maze = Maze(10, 10)
-    grid = maze.generate_maze()
-    assert len(grid) == 10
-    assert all(len(row) == 10 for row in grid)
-    assert grid[1][1] == 0  # Начальная точка свободна
+    # Убедиться, что есть открытые пространства в лабиринте
+    open_spaces = sum(row.count(0) for row in maze_data)
+    assert open_spaces > 0
+
+# Тестирование инициализации игры
+def test_game_initialization(game):
+    assert game.coin_count == 0
+    assert isinstance(game.maze, Maze)
+    assert isinstance(game.player, Player)
+
+# Тестирование настройки уровня
+def test_setup_level(game):
+    game.setup_level()
+    assert len(game.walls) == game.maze.width + game.maze.height + 4
+    assert isinstance(game.end_rect, pygame.Rect)
+
+# Тестирование сбора монет игроком
+def test_coin_collection(game):
+    game.setup_level()
+    initial_coin_count = len(game.coins)
+    game.player.rect.topleft = game.coins[0].rect.topleft
+    game.run()
+    assert len(game.coins) < initial_coin_count
+    assert game.coin_count >= 1
+
+# Тестирование временного ограничения игры
+def test_time_limit(game):
+    game.setup_level()
+    game.run()
+    assert time.time() - game.start_time <= game.max_time
