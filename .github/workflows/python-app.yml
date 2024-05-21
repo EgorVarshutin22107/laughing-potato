@@ -1,14 +1,23 @@
-name: CI/CD GitHub Actions
+name: Python package
+
 on: [push]
+
 jobs:
-  tests:
+  build:
+
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.9", "3.10", "3.11"]
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
-      - run: git submodule init
-      - run: git submodule update
-      - run: pip install --user cpp-coveralls
-      - run: sudo apt-get update -y && sudo apt-get install -y qt5-qmake qtbase5-dev qtchooser qtbase5-dev-tools
-      - run: ./app/test
+          python-version: ${{ matrix.python }}
+      - name: Install tox and any other packages
+        run: pip install tox
+      - name: Run tox
+        # Run tox using the version of Python in `PATH`
+        run: tox -e py
