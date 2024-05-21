@@ -3,3 +3,4 @@ venv
 .pytest_cahe
 __pycache__
 pytest.ini
+.gitignore
