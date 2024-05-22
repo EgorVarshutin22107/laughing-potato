@@ -1,3 +1,5 @@
+[![Python application](https://github.com/EgorVarshutin22107/laughing-potato/actions/workflows/python-app.yml/badge.svg)](https://github.com/EgorVarshutin22107/laughing-potato/actions/workflows/python-app.yml)
+
 # Варшутин Егор группа 22107
 --------------------------------------------------
 
