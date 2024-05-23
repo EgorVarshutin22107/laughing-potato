@@ -57,12 +57,12 @@ jobs:
         wget -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip
         unzip sonar-scanner.zip
 
-    - name: Run sonar-scanner
+    - name: Run sonar-scanner with debug
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
-        ./sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux/bin/sonar-scanner \
+        ./sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux/bin/sonar-scanner -X \
           -Dsonar.projectKey=EgorVarshutin22107_laughing-potato \
           -Dsonar.organization=egorvarshutin22107 \
           -Dsonar.host.url=${{ env.SONAR_SERVER_URL }} \
