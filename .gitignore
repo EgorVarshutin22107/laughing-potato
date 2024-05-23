@@ -2,3 +2,5 @@
 venv
 .pytest_cahe
 __pycache__
+.coverage
+coverage.xml

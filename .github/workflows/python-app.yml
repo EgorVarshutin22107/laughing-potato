@@ -19,11 +19,19 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest pygame coverage
 
+    - name: Verify installation
+      run: |
+        pip show coverage
+        coverage --version
+
     - name: Run tests with coverage
       run: |
-        coverage run -m pytest app/test_main.py
-        coverage xml
-        coverage report
+        python -m coverage run -m pytest app/test_main.py
+        python -m coverage xml
+        python -m coverage report
+
+    - name: List files in the directory
+      run: ls -la
 
     - name: Upload coverage to Coveralls
       uses: coverallsapp/github-action@v2
@@ -51,6 +59,9 @@ jobs:
     - name: Run test
       run: pytest
 
+    - name: List files in the directory
+      run: ls -la
+
     - name: SonarCloud Scan
       uses: SonarSource/sonarcloud-github-action@master
       env:
@@ -61,3 +72,4 @@ jobs:
           -Dsonar.organization=egorvarshutin22107
           -Dsonar.projectKey=EgorVarshutin22107_laughing-potato
           -Dsonar.python.coverage.reportPaths=coverage.xml
+          -X
