@@ -1,8 +1,6 @@
 import os
-import sys
 import random
 import pygame
-import time
 
 # Класс для игрока
 class Player:
