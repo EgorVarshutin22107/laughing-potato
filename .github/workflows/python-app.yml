@@ -47,17 +47,17 @@ jobs:
 
     - uses: actions/setup-java@v3
       with:
-        distribution: 'temurin' # See 'Supported distributions' for available options
+        distribution: 'temurin'
         java-version: '17'
 
-    - name: Install SonarScanner
+    - name: Download and set up SonarScanner and Build Wrapper
       run: |
         wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip
         unzip sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip
-
-    - name: Set up SonarScanner
-      run: |
         export PATH=$PATH:$(pwd)/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux/bin
+        wget https://binaries.sonarsource.com/Distribution/build-wrapper-linux-x86/build-wrapper-linux-x86.zip
+        unzip build-wrapper-linux-x86.zip
+        export PATH=$PATH:$(pwd)/build-wrapper-linux-x86
 
     - name: Set up Python 3.8 for gcovr
       uses: actions/setup-python@v4
