@@ -23,6 +23,7 @@ jobs:
       run: |
         coverage run -m pytest app/test_main.py
         coverage xml
+        coverage report
 
     - name: Upload coverage to Coveralls
       uses: coverallsapp/github-action@v2
