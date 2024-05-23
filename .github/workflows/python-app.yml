@@ -51,10 +51,8 @@ jobs:
     - name: Install tox and any other packages
       run: pip install -r requirements.txt
 
-    - name: Run tests with coverage
-      run: |
-        python -m coverage run -m pytest app/test_main.py
-        python -m coverage xml
+    - name: Run tests
+      run: pytest
 
     - name: List files in the directory
       run: ls -la
