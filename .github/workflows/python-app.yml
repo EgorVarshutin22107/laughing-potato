@@ -18,13 +18,15 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pytest pygame coverage
-
+    - name: Verify installation
+      run: |
+        pip show coverage
+        coverage --version
     - name: Run tests with coverage
       run: |
         python -m coverage run -m pytest app/test_main.py
         python -m coverage xml
         python -m coverage report
-
     - name: List files in the directory
       run: ls -la
 
@@ -51,10 +53,8 @@ jobs:
     - name: Install tox and any other packages
       run: pip install -r requirements.txt
 
-    - name: Run tests with coverage
-      run: |
-        python -m coverage run -m pytest app/test_main.py
-        python -m coverage xml
+    - name: Run test
+      run: pytest
 
     - name: List files in the directory
       run: ls -la
@@ -69,4 +69,3 @@ jobs:
           -Dsonar.organization=egorvarshutin22107
           -Dsonar.projectKey=EgorVarshutin22107_laughing-potato
           -Dsonar.python.coverage.reportPaths=coverage.xml
-          -X
