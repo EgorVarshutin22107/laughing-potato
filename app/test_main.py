@@ -83,45 +83,13 @@ def game():
     game.setup_level()
     return game
 
-# def test_maze_setup(game):
-#     # Test that walls are created correctly
-#     assert len(game.walls) > 0, "Walls should be created"
-    
-#     # Ensure that the maze grid is generated
-#     maze = game.maze.grid
-#     assert len(maze) == game.maze.height, "Maze height should be correct"
-#     assert len(maze[0]) == game.maze.width, "Maze width should be correct"
-
-#     # Check that player starts at the correct position
-#     assert game.player.rect.topleft == (1 * 16 + game.maze_offset_x, 1 * 16 + game.maze_offset_y), "Player start position should be correct"
-
-#     # Check that end position is set correctly
-#     end_x = (game.maze.width - 2) * 16 + game.maze_offset_x
-#     end_y = (game.maze.height - 2) * 16 + game.maze_offset_y
-#     assert game.end_rect.topleft == (end_x, end_y), "End position should be correct"
-
-#     # Ensure coins are placed
-#     assert len(game.coins) > 0, "Coins should be placed in the maze"
-
-#     # Count the number of slow and normal coins
-#     positive_coins = sum(1 for coin in game.coins if not coin.slow)
-#     slow_coins = sum(1 for coin in game.coins if coin.slow)
-    
-#     assert positive_coins > 0, "There should be some positive coins"
-#     assert slow_coins > 0, "There should be some slow coins"
-
-#     # Ensure walls do not overlap with coins or player
-#     for wall in game.walls:
-#         assert not wall.rect.colliderect(game.player.rect), "Player should not overlap with walls"
-#         assert not wall.rect.colliderect(game.end_rect), "End position should not overlap with walls"
-#         for coin in game.coins:
-#             assert not wall.rect.colliderect(coin.rect), "Coins should not overlap with walls"
-
-#     # Ensure coins do not overlap with the player start position or end position
-#     for coin in game.coins:
-#         assert not coin.rect.colliderect(game.player.rect), "Coins should not overlap with player start position"
-#         assert not coin.rect.colliderect(game.end_rect), "Coins should not overlap with end position"
-
+def test_game_initialization():
+    game = Game()
+    assert game.screen.get_width() == 740
+    assert game.screen.get_height() == 580
+    assert game.font is not None
+    assert game.player is not None
+    assert game.maze is not None
 
 if __name__ == "__main__":
     pytest.main()
