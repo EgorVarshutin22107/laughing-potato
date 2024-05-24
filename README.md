@@ -1,5 +1,6 @@
 [![Python application](https://github.com/EgorVarshutin22107/laughing-potato/actions/workflows/python-app.yml/badge.svg)](https://github.com/EgorVarshutin22107/laughing-potato/actions/workflows/python-app.yml)
 [![Coverage Status](https://coveralls.io/repos/github/EgorVarshutin22107/laughing-potato/badge.svg)](https://coveralls.io/github/EgorVarshutin22107/laughing-potato)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=EgorVarshutin22107_laughing-potato&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=EgorVarshutin22107_laughing-potato)
 
 # Варшутин Егор группа 22107
 --------------------------------------------------
