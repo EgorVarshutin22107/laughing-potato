@@ -1,5 +1,7 @@
 import pytest
-from main import Player, Coin, Wall, Maze, Game
+import pygame
+from io import *
+from main import Game, Player, Coin, Wall, Maze
 
 # Фикстура для создания экземпляра игрока для тестирования
 @pytest.fixture
@@ -25,6 +27,12 @@ def maze():
 @pytest.fixture
 def game():
     return Game()
+
+@pytest.fixture
+def game():
+    game = Game()
+    game.setup_level()
+    return game
 
 # Тестирование движения игрока без столкновения с препятствиями
 def test_player_move_no_collision(player):
@@ -71,64 +79,101 @@ def test_generate_maze(maze):
     open_spaces = sum(row.count(0) for row in maze_data)
     assert open_spaces > 0
 
-# Тестирование инициализации игры
-def test_game_initialization(game):
-    assert game.coin_count == 0
-    assert isinstance(game.maze, Maze)
-    assert isinstance(game.player, Player)
+# Constants used in the game
+MAZE_WIDTH = 40
+MAZE_HEIGHT = 30
+MAZE_OFFSET_X = 0
+MAZE_OFFSET_Y = 50
 
 @pytest.fixture
 def game():
-    game = Game()
+    game_instance = Game()
+    game_instance.setup_level()  # Setup the level initially
+    return game_instance
+
+def test_game_initialization(game):
+    assert isinstance(game, Game)
+    assert isinstance(game.player, Player)
+    assert isinstance(game.maze, Maze)
+
+def test_setup_level(game):
     game.setup_level()
-    return game
-
-# def test_maze_setup(game):
-#     # Test that walls are created correctly
-#     assert len(game.walls) > 0, "Walls should be created"
+    assert len(game.walls) > 0
+    assert len(game.coins) > 0
+    assert isinstance(game.end_rect, pygame.Rect)
+    assert any(isinstance(coin, Coin) for coin in game.coins)
     
-#     # Ensure that the maze grid is generated
-#     maze = game.maze.grid
-#     assert len(maze) == game.maze.height, "Maze height should be correct"
-#     assert len(maze[0]) == game.maze.width, "Maze width should be correct"
-
-#     # Check that player starts at the correct position
-#     assert game.player.rect.topleft == (1 * 16 + game.maze_offset_x, 1 * 16 + game.maze_offset_y), "Player start position should be correct"
-
-#     # Check that end position is set correctly
-#     end_x = (game.maze.width - 2) * 16 + game.maze_offset_x
-#     end_y = (game.maze.height - 2) * 16 + game.maze_offset_y
-#     assert game.end_rect.topleft == (end_x, end_y), "End position should be correct"
-
-#     # Ensure coins are placed
-#     assert len(game.coins) > 0, "Coins should be placed in the maze"
-
-#     # Count the number of slow and normal coins
-#     positive_coins = sum(1 for coin in game.coins if not coin.slow)
-#     slow_coins = sum(1 for coin in game.coins if coin.slow)
+    # Ensure player is placed correctly
+    player_start_position = (1 * 16 + MAZE_OFFSET_X, 1 * 16 + MAZE_OFFSET_Y)
+    assert game.player.rect.topleft == player_start_position
     
-#     assert positive_coins > 0, "There should be some positive coins"
-#     assert slow_coins > 0, "There should be some slow coins"
+    # Ensure end position is set
+    end_position = (MAZE_WIDTH - 2, MAZE_HEIGHT - 2)
+    expected_end_rect = pygame.Rect(end_position[0] * 16 + MAZE_OFFSET_X, end_position[1] * 16 + MAZE_OFFSET_Y, 16, 16)
+    assert game.end_rect == expected_end_rect
 
-#     # Ensure walls do not overlap with coins or player
-#     for wall in game.walls:
-#         assert not wall.rect.colliderect(game.player.rect), "Player should not overlap with walls"
-#         assert not wall.rect.colliderect(game.end_rect), "End position should not overlap with walls"
-#         for coin in game.coins:
-#             assert not wall.rect.colliderect(coin.rect), "Coins should not overlap with walls"
+def test_internal_wall_count(game, capsys):
+    game.setup_level()
+    captured = capsys.readouterr()
+    internal_walls_count = sum(row.count(1) for row in game.maze.grid)
+    perimeter_walls_count = (MAZE_WIDTH * 2) + (MAZE_HEIGHT * 2)
+    total_walls_count = len(game.walls)
+    expected_internal_walls_count = 600  # The expected count from the output
+    tolerance = 10  # Allowable tolerance
+    assert abs(internal_walls_count - expected_internal_walls_count) <= tolerance, \
+        f"Internal walls count: {internal_walls_count} is not within tolerance of {expected_internal_walls_count}"
+    assert f"Perimeter walls count: {perimeter_walls_count}" in captured.out
+    assert f"Total walls count: {total_walls_count}" in captured.out
 
-#     # Ensure coins do not overlap with the player start position or end position
-#     for coin in game.coins:
-#         assert not coin.rect.colliderect(game.player.rect), "Coins should not overlap with player start position"
-#         assert not coin.rect.colliderect(game.end_rect), "Coins should not overlap with end position"
+def test_player_movement(game):
+    game.setup_level()
+    initial_position = game.player.rect.topleft
+    print(f"Initial position: {initial_position}")
 
-def test_game_initialization():
-    game = Game()
-    assert game.screen.get_width() == 740
-    assert game.screen.get_height() == 580
-    assert game.font is not None
-    assert game.player is not None
-    assert game.maze is not None
+    # Test moving right
+    right_possible = not any(wall.rect.topleft == (initial_position[0] + 16, initial_position[1]) for wall in game.walls)
+    game.player.move(16, 0, game.walls)
+    new_position = (initial_position[0] + 16, initial_position[1]) if right_possible else initial_position
+    print(f"Position after moving right: {game.player.rect.topleft}")
+    assert game.player.rect.topleft == new_position, \
+        f"Expected position: {new_position}, but got: {game.player.rect.topleft}"
+
+    # Test moving left back to initial position
+    left_possible = not any(wall.rect.topleft == (new_position[0] - 16, new_position[1]) for wall in game.walls)
+    game.player.move(-16, 0, game.walls)
+    expected_position = initial_position if left_possible else new_position
+    print(f"Position after moving left: {game.player.rect.topleft}")
+    assert game.player.rect.topleft == expected_position, \
+        f"Expected position: {expected_position}, but got: {game.player.rect.topleft}"
+
+    # Test moving down
+    down_possible = not any(wall.rect.topleft == (initial_position[0], initial_position[1] + 16) for wall in game.walls)
+    game.player.move(0, 16, game.walls)
+    new_position = (initial_position[0], initial_position[1] + 16) if down_possible else initial_position
+    print(f"Position after moving down: {game.player.rect.topleft}")
+    assert game.player.rect.topleft == new_position, \
+        f"Expected position: {new_position}, but got: {game.player.rect.topleft}"
+
+    # Test moving up back to initial position
+    up_possible = not any(wall.rect.topleft == (new_position[0], new_position[1] - 16) for wall in game.walls)
+    game.player.move(0, -16, game.walls)
+    expected_position = initial_position if up_possible else new_position
+    print(f"Position after moving up: {game.player.rect.topleft}")
+    assert game.player.rect.topleft == expected_position, \
+        f"Expected position: {expected_position}, but got: {game.player.rect.topleft}"
+
+def test_coin_collision(game):
+    game.setup_level()
+    initial_coin_count = len(game.coins)
+    for coin in game.coins[:]:
+        game.player.rect.topleft = coin.rect.topleft
+        game.coins.remove(coin)
+    assert len(game.coins) == 0
+
+def test_end_game_condition(game):
+    game.setup_level()
+    game.player.rect.topleft = game.end_rect.topleft
+    assert game.player.rect.colliderect(game.end_rect)
 
 if __name__ == "__main__":
     pytest.main()

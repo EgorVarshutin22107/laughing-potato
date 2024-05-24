@@ -2,6 +2,7 @@ import os
 import random
 import pygame
 
+
 # Класс для игрока
 class Player:
     def __init__(self):
