@@ -1,7 +1,6 @@
 import pytest
 import pygame
-from io import *
-from main import Game, Player, Coin, Wall, Maze
+from main import Game, Player, Coin, Wall, Maze, UI
 
 # Фикстура для создания экземпляра игрока для тестирования
 @pytest.fixture
@@ -26,13 +25,16 @@ def maze():
 # Фикстура для создания экземпляра игры для тестирования
 @pytest.fixture
 def game():
-    return Game()
+    game_instance = Game()
+    game_instance.setup_level()
+    return game_instance
 
 @pytest.fixture
-def game():
-    game = Game()
-    game.setup_level()
-    return game
+def ui():
+    pygame.init()
+    screen = pygame.display.set_mode((740, 580))
+    font = pygame.font.SysFont(None, 36)
+    return UI(screen, font)
 
 # Тестирование движения игрока без столкновения с препятствиями
 def test_player_move_no_collision(player):
@@ -85,12 +87,6 @@ MAZE_HEIGHT = 30
 MAZE_OFFSET_X = 0
 MAZE_OFFSET_Y = 50
 
-@pytest.fixture
-def game():
-    game_instance = Game()
-    game_instance.setup_level()  # Setup the level initially
-    return game_instance
-
 def test_game_initialization(game):
     assert isinstance(game, Game)
     assert isinstance(game.player, Player)
@@ -111,19 +107,6 @@ def test_setup_level(game):
     end_position = (MAZE_WIDTH - 2, MAZE_HEIGHT - 2)
     expected_end_rect = pygame.Rect(end_position[0] * 16 + MAZE_OFFSET_X, end_position[1] * 16 + MAZE_OFFSET_Y, 16, 16)
     assert game.end_rect == expected_end_rect
-
-# def test_internal_wall_count(game, capsys):
-#     game.setup_level()
-#     captured = capsys.readouterr()
-#     internal_walls_count = sum(row.count(1) for row in game.maze.grid)
-#     perimeter_walls_count = (MAZE_WIDTH * 2) + (MAZE_HEIGHT * 2)
-#     total_walls_count = len(game.walls)
-#     expected_internal_walls_count = 600  # The expected count from the output
-#     tolerance = 10  # Allowable tolerance
-#     assert abs(internal_walls_count - expected_internal_walls_count) <= tolerance, \
-#         f"Internal walls count: {internal_walls_count} is not within tolerance of {expected_internal_walls_count}"
-#     assert f"Perimeter walls count: {perimeter_walls_count}" in captured.out
-#     assert f"Total walls count: {total_walls_count}" in captured.out
 
 def test_player_movement(game):
     game.setup_level()
@@ -174,6 +157,30 @@ def test_end_game_condition(game):
     game.setup_level()
     game.player.rect.topleft = game.end_rect.topleft
     assert game.player.rect.colliderect(game.end_rect)
+
+# Тесты для класса UI
+def test_show_statistics(ui):
+    ui.show_statistics(10, 123.45)
+    # Проверяем, что текст отрисован на экране
+    screen_array = pygame.surfarray.array3d(ui.screen)
+    assert screen_array.any()  # Убеждаемся, что что-то отрисовано
+
+def test_show_exit_confirmation(ui):
+    pygame.event.clear()
+    # Добавляем событие закрытия окна в очередь событий
+    pygame.event.post(pygame.event.Event(pygame.QUIT))
+    result = ui.show_exit_confirmation()
+    # Проверяем, что результат False при закрытии окна
+    assert result is False
+
+def test_show_main_menu(ui):
+    pygame.event.clear()
+    # Добавляем событие клика мышью на кнопку "Начать Игру" в очередь событий
+    start_button_x, start_button_y = 370, 280  # Координаты кнопки
+    pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (start_button_x, start_button_y)}))
+    result = ui.show_main_menu()
+    # Проверяем, что результат "start" при клике на кнопку "Начать Игру"
+    assert result == "start"
 
 if __name__ == "__main__":
     pytest.main()
