@@ -1,7 +1,8 @@
 import os
+import sys
 import random
 import pygame
-
+import time
 
 # Класс для игрока
 class Player:
@@ -55,7 +56,6 @@ class Maze:
         if self.width < 3 or self.height < 3:
             raise ValueError("Maze size too small")
         maze = [[1] * self.width for _ in range(self.height)]
-        
         def carve_passages_from(cx, cy):
             directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
             random.shuffle(directions)
@@ -65,7 +65,6 @@ class Maze:
                     maze[cy + direction[1]][cx + direction[0]] = 0
                     maze[ny][nx] = 0
                     carve_passages_from(nx, ny)
-                    
         maze[1][1] = 0
         carve_passages_from(1, 1)
         return maze
@@ -75,6 +74,39 @@ class UI:
     def __init__(self, screen, font):
         self.screen = screen
         self.font = font
+
+    def show_statistics(self, coin_count, elapsed_time):
+        self.screen.fill((0, 0, 0))
+        stats_text = self.font.render(f"Всего собрано монет: {coin_count}", True, (255, 255, 255))
+        time_text = self.font.render(f"Время: {elapsed_time:.2f} секунд", True, (255, 255, 255))
+        self.screen.blit(stats_text, (screen_width // 2 - stats_text.get_width() // 2, screen_height // 2 - stats_text.get_height() // 2 - 20))
+        self.screen.blit(time_text, (screen_width // 2 - time_text.get_width() // 2, screen_height // 2 - time_text.get_height() // 2 + 20))
+        pygame.display.flip()
+        pygame.time.wait(3000)
+
+    def show_exit_confirmation(self):
+        self.screen.fill((0, 0, 0))
+        confirm_text = self.font.render("Вы действительно хотите выйти?", True, (255, 255, 255))
+        yes_text = self.font.render("Да", True, (0, 255, 0))
+        no_text = self.font.render("Остаться", True, (255, 0, 0))
+        self.screen.blit(confirm_text, (screen_width // 2 - confirm_text.get_width() // 2, screen_height // 2 - confirm_text.get_height() // 2 - 40))
+        yes_rect = yes_text.get_rect(center=(screen_width // 2 - 60, screen_height // 2 + 20))
+        no_rect = no_text.get_rect(center=(screen_width // 2 + 60, screen_height // 2 + 20))
+        self.screen.blit(yes_text, yes_rect)
+        self.screen.blit(no_text, no_rect)
+        pygame.display.flip()
+
+        while True:
+            for e in pygame.event.get():
+                if e.type == pygame.QUIT:
+                    return False
+                if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
+                    return False
+                if e.type == pygame.MOUSEBUTTONDOWN and e.button == 1:
+                    if yes_rect.collidepoint(e.pos):
+                        return True
+                    if no_rect.collidepoint(e.pos):
+                        return False
 
     def show_main_menu(self):
         self.screen.fill((0, 0, 0))
@@ -92,13 +124,13 @@ class UI:
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
                     pygame.quit()
-                    return "exit"
+                    sys.exit()
                 if e.type == pygame.MOUSEBUTTONDOWN and e.button == 1:
                     if start_rect.collidepoint(e.pos):
                         return "start"
                     if exit_rect.collidepoint(e.pos):
                         pygame.quit()
-                        return "exit"
+                        sys.exit()
 
 # Класс для игры
 class Game:
@@ -111,15 +143,16 @@ class Game:
         maze_offset_x, maze_offset_y = 0, 50
         self.screen = pygame.display.set_mode((screen_width, screen_height))
         pygame.display.set_caption("Достигните конца лабиринта!")
-
+        
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont(None, 36)
         self.ui = UI(self.screen, self.font)
 
+        global walls, player, coins, end_rect
         self.walls = []
         self.coins = []
         self.player = Player()
-
+        
         global maze_width, maze_height
         maze_width, maze_height = 40, 30
         self.maze = Maze(maze_width, maze_height)
@@ -168,13 +201,76 @@ class Game:
         for y in range(maze_height):
             self.walls.append(Wall((maze_width * 16 + maze_offset_x, y * 16 + maze_offset_y)))
 
-        # Отладочный вывод
-        internal_walls_count = sum(row.count(1) for row in maze)
-        perimeter_walls_count = (maze_width * 2) + (maze_height * 2)
-        total_walls_count = len(self.walls)
-        print(f"Internal walls count: {internal_walls_count}")
-        print(f"Perimeter walls count: {perimeter_walls_count}")
-        print(f"Total walls count: {total_walls_count}")
+    def run(self):
+        while True:
+            menu_choice = self.ui.show_main_menu()
+            if menu_choice != "start":
+                pygame.quit()
+                sys.exit()
+
+            self.setup_level()
+            
+            start_time = time.time()
+            max_time = 120
+            running = True
+
+            while running:
+                self.clock.tick(60)
+                
+                for e in pygame.event.get():
+                    if e.type == pygame.QUIT:
+                        running = False
+                    if e.type == pygame.KEYDOWN and e.key == pygame.K_BACKQUOTE:
+                        if self.ui.show_exit_confirmation():
+                            running = False
+
+                key = pygame.key.get_pressed()
+                current_time = time.time()
+                speed = self.player.speed // 2 if self.player.slowed_until > current_time else self.player.speed
+
+                if key[pygame.K_LEFT]:
+                    self.player.move(-speed, 0, self.walls)
+                if key[pygame.K_RIGHT]:
+                    self.player.move(speed, 0, self.walls)
+                if key[pygame.K_UP]:
+                    self.player.move(0, -speed, self.walls)
+                if key[pygame.K_DOWN]:
+                    self.player.move(0, speed, self.walls)
+
+                for coin in self.coins[:]:
+                    if self.player.rect.colliderect(coin.rect):
+                        self.coins.remove(coin)
+                        if coin.slow:
+                            self.player.slowed_until = current_time + 5
+                        else:
+                            self.coin_count += 1
+
+                if self.player.rect.colliderect(self.end_rect):
+                    elapsed_time = time.time() - start_time
+                    self.ui.show_statistics(self.coin_count, elapsed_time)
+                    break
+
+                elapsed_time = time.time() - start_time
+                if elapsed_time > max_time:
+                    self.ui.show_statistics(self.coin_count, elapsed_time)
+                    break
+
+                self.screen.fill((0, 0, 0))
+                for wall in self.walls:
+                    pygame.draw.rect(self.screen, (255, 255, 255), wall.rect)
+                for coin in self.coins:
+                    color = (128, 0, 128) if coin.slow else (255, 255, 0)
+                    pygame.draw.ellipse(self.screen, color, coin.rect)
+                pygame.draw.rect(self.screen, (255, 0, 0), self.end_rect)
+                pygame.draw.rect(self.screen, (255, 200, 0), self.player.rect)
+
+                coin_text = self.font.render(f"Монеты: {self.coin_count}", True, (255, 255, 255))
+                self.screen.blit(coin_text, (10, 10))
+
+                timer_text = self.font.render(f"Время: {elapsed_time:.2f} с", True, (255, 255, 255))
+                self.screen.blit(timer_text, (screen_width - timer_text.get_width() - 10, 10))
+
+                pygame.display.flip()
 
 if __name__ == "__main__":
     game = Game()

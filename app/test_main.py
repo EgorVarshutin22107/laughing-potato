@@ -112,18 +112,18 @@ def test_setup_level(game):
     expected_end_rect = pygame.Rect(end_position[0] * 16 + MAZE_OFFSET_X, end_position[1] * 16 + MAZE_OFFSET_Y, 16, 16)
     assert game.end_rect == expected_end_rect
 
-def test_internal_wall_count(game, capsys):
-    game.setup_level()
-    captured = capsys.readouterr()
-    internal_walls_count = sum(row.count(1) for row in game.maze.grid)
-    perimeter_walls_count = (MAZE_WIDTH * 2) + (MAZE_HEIGHT * 2)
-    total_walls_count = len(game.walls)
-    expected_internal_walls_count = 600  # The expected count from the output
-    tolerance = 10  # Allowable tolerance
-    assert abs(internal_walls_count - expected_internal_walls_count) <= tolerance, \
-        f"Internal walls count: {internal_walls_count} is not within tolerance of {expected_internal_walls_count}"
-    assert f"Perimeter walls count: {perimeter_walls_count}" in captured.out
-    assert f"Total walls count: {total_walls_count}" in captured.out
+# def test_internal_wall_count(game, capsys):
+#     game.setup_level()
+#     captured = capsys.readouterr()
+#     internal_walls_count = sum(row.count(1) for row in game.maze.grid)
+#     perimeter_walls_count = (MAZE_WIDTH * 2) + (MAZE_HEIGHT * 2)
+#     total_walls_count = len(game.walls)
+#     expected_internal_walls_count = 600  # The expected count from the output
+#     tolerance = 10  # Allowable tolerance
+#     assert abs(internal_walls_count - expected_internal_walls_count) <= tolerance, \
+#         f"Internal walls count: {internal_walls_count} is not within tolerance of {expected_internal_walls_count}"
+#     assert f"Perimeter walls count: {perimeter_walls_count}" in captured.out
+#     assert f"Total walls count: {total_walls_count}" in captured.out
 
 def test_player_movement(game):
     game.setup_level()
