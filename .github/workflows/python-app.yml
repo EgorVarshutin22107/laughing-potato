@@ -49,7 +49,10 @@ jobs:
           echo "$HOME/sonar-scanner/sonar-scanner-4.6.2.2472-linux/bin" >> $GITHUB_PATH
 
       - name: Run SonarScanner
-        run: sonar-scanner
+        run: |
+          export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+          export PATH="$JAVA_HOME/bin:$PATH"
+          sonar-scanner
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: "https://sonarcloud.io"
