@@ -30,11 +30,23 @@ jobs:
           python -m coverage xml
           python -m coverage report
 
-      - name: List files in the directory
-        run: ls -la
-
       - name: Upload coverage to Coveralls
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: coverage.xml
+
+      - name: Install SonarScanner
+        run: |
+          wget -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
+          unzip sonar-scanner.zip -d $HOME
+          export PATH="$HOME/sonar-scanner-4.6.2.2472-linux/bin:$PATH"
+
+      - name: Run SonarScanner
+        run: sonar-scanner
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: "https://sonarcloud.io"
+          SONAR_PROJECT_KEY: "EgorVarshutin22107_laughing-potato"
+          SONAR_ORGANIZATION: "egorvarshutin22107"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
