@@ -38,19 +38,25 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: coverage.xml
 
-      - name: Setup Java 17
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'adopt'
-          java-version: '17'
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v1
+      - name: Setup Java and SonarScanner
+        run: |
+          # Install Java 17
+          sudo apt-get update
+          sudo apt-get install -y openjdk-17-jdk
+          # Install SonarScanner
+          wget -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
+          unzip sonar-scanner.zip -d $HOME/sonar-scanner
+          export PATH=$HOME/sonar-scanner/sonar-scanner-4.8.0.2856-linux/bin:$PATH
+          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+          # Run SonarScanner
+          sonar-scanner -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
+                        -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
+                        -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+                        -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+                        -X
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: "https://sonarcloud.io"
           SONAR_PROJECT_KEY: "EgorVarshutin22107_laughing-potato"
           SONAR_ORGANIZATION: "egorvarshutin22107"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.6-10/x64
-          PATH: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.6-10/x64/bin:${{ github.workspace }}
