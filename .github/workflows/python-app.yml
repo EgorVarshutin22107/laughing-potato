@@ -1,11 +1,11 @@
 name: Python application
 
-on: 
+on:
   push:
     branches:
-      - main
-  pull_request:
-    types: [opened, synchronize, reopened]
+      - master
+      - develop
+      - sonar-qube-setup
 
 jobs:
   build:
@@ -24,38 +24,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest pygame coverage numpy
 
-      - name: Run tests with coverage
+      - name: Test with pytest
         run: |
-          python -m coverage run -m pytest app/test_main.py
-          python -m coverage xml
-          python -m coverage report
+              pytest --cov=./ --cov-report=xml --doctest-modules
 
-      - name: Upload coverage to Coveralls
-        uses: coverallsapp/github-action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: coverage.xml
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'adopt'
-          java-version: '17'
-
-      - name: Install SonarScanner
-        run: |
-          wget -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170-linux.zip
-          unzip sonar-scanner.zip -d $HOME/sonar-scanner
-          echo "$HOME/sonar-scanner/sonar-scanner-4.4.0.2170-linux/bin" >> $GITHUB_PATH
-
-      - name: Run SonarScanner
-        run: |
-          export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
-          export PATH="$JAVA_HOME/bin:$PATH"
-          sonar-scanner
+            # Sonar Qube
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: "https://sonarcloud.io"
-          SONAR_PROJECT_KEY: "EgorVarshutin22107_laughing-potato"
-          SONAR_ORGANIZATION: "egorvarshutin22107"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
