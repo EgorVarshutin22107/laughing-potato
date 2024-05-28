@@ -54,7 +54,7 @@ jobs:
         run: |
           export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
           export PATH="$JAVA_HOME/bin:$PATH"
-          sonar-scanner
+          sonar-scanner -X
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: "https://sonarcloud.io"
