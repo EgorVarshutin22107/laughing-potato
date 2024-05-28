@@ -1,5 +1,6 @@
 import pytest
 import pygame
+from unittest.mock import patch, Mock
 from main import Game, Player, Coin, Wall, Maze, UI
 
 # -------------------- Фикстуры --------------------
@@ -37,6 +38,14 @@ def ui():
     screen = pygame.display.set_mode((740, 580))
     font = pygame.font.SysFont(None, 36)
     return UI(screen, font)
+
+@pytest.fixture
+def game():
+    pygame.init()
+    game = Game()
+    game.setup_level()
+    yield game
+    pygame.quit()
 
 # -------------------- Тесты для класса Player --------------------
 
@@ -165,6 +174,65 @@ def test_end_game_condition(game):
     game.setup_level()
     game.player.rect.topleft = game.end_rect.topleft
     assert game.player.rect.colliderect(game.end_rect)
+
+# -------------------- Тесты для функции run класса Game --------------------
+
+# Тестирование функции run
+
+# def simulate_key_press(game, key, duration=100):
+#     start_ticks = pygame.time.get_ticks()
+#     while pygame.time.get_ticks() - start_ticks < duration:
+#         for event in pygame.event.get():
+#             if event.type == pygame.QUIT:
+#                 return
+#         pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=key))
+#         game.run()
+#         pygame.event.post(pygame.event.Event(pygame.KEYUP, key=key))
+
+# def simulate_mouse_click(game, position):
+#     pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=position))
+#     pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONUP, button=1, pos=position))
+#     game.run()
+
+# def test_run_gameplay(game):
+#     # Simulate clicking on the "Начать Игру" button
+#     start_button_position = (game.screen.get_width() // 2, game.screen.get_height() // 2 - 20)
+#     simulate_mouse_click(game, start_button_position)
+    
+#     # Simulate right arrow key press
+#     simulate_key_press(game, pygame.K_RIGHT, duration=100)
+    
+#     # Check if the player's position has been updated correctly
+#     assert game.player.rect.x > 32
+
+# def test_run_exit_confirmation(game):
+#     # Simulate clicking on the "Начать Игру" button
+#     start_button_position = (game.screen.get_width() // 2, game.screen.get_height() // 2 - 20)
+#     simulate_mouse_click(game, start_button_position)
+    
+#     # Simulate backquote key press to trigger exit confirmation
+#     simulate_key_press(game, pygame.K_BACKQUOTE, duration=100)
+    
+#     # Check if the exit confirmation was shown
+#     assert game.ui.show_exit_confirmation.called
+
+# def test_coin_collection(game):
+#     # Simulate clicking on the "Начать Игру" button
+#     start_button_position = (game.screen.get_width() // 2, game.screen.get_height() // 2 - 20)
+#     simulate_mouse_click(game, start_button_position)
+
+#     # Set a coin directly in front of the player
+#     coin_position = (game.player.rect.x + 16, game.player.rect.y)
+#     game.coins = [Coin(coin_position)]
+
+#     # Simulate right arrow key press to collect coin
+#     simulate_key_press(game, pygame.K_RIGHT, duration=100)
+
+#     # Check if the coin was collected
+#     assert game.coin_count == 1
+#     assert len(game.coins) == 0
+
+
 
 if __name__ == "__main__":
     pytest.main()
