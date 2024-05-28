@@ -46,11 +46,11 @@ jobs:
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v1
-        with:
-          args: -X
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: "https://sonarcloud.io"
           SONAR_PROJECT_KEY: "EgorVarshutin22107_laughing-potato"
           SONAR_ORGANIZATION: "egorvarshutin22107"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.6-10/x64
+          PATH: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.6-10/x64/bin:${{ github.workspace }}
