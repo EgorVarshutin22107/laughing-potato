@@ -38,15 +38,19 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: coverage.xml
 
-      - name: Setup Java 11
+      - name: Setup Java 17
         uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
-          java-version: '11'
+          java-version: '17'
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v1
+        with:
+          args: -X
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          projectBaseDir: .
+          SONAR_HOST_URL: "https://sonarcloud.io"
+          SONAR_PROJECT_KEY: "EgorVarshutin22107_laughing-potato"
+          SONAR_ORGANIZATION: "egorvarshutin22107"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
