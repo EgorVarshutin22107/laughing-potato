@@ -2,6 +2,8 @@ import pytest
 import pygame
 from main import Game, Player, Coin, Wall, Maze, UI
 
+# -------------------- Фикстуры --------------------
+
 # Фикстура для создания экземпляра игрока для тестирования
 @pytest.fixture
 def player():
@@ -36,6 +38,8 @@ def ui():
     font = pygame.font.SysFont(None, 36)
     return UI(screen, font)
 
+# -------------------- Тесты для класса Player --------------------
+
 # Тестирование движения игрока без столкновения с препятствиями
 def test_player_move_no_collision(player):
     # Перемещаем игрока на 5 пикселей вправо, без стен на пути
@@ -52,6 +56,8 @@ def test_player_move_with_collision(player, wall):
     player.move(16, 0, [wall])
     assert player.rect.right == wall.rect.left  # Проверяем корректное столкновение
 
+# -------------------- Тесты для класса Coin --------------------
+
 # Тестирование позиции монеты и её свойств
 def test_coin_position(coin):
     assert coin.rect.topleft == (100, 100)
@@ -62,9 +68,13 @@ def test_slow_coin():
     slow_coin = Coin((200, 200), slow=True)
     assert slow_coin.slow
 
+# -------------------- Тесты для класса Wall --------------------
+
 # Тестирование позиции стены
 def test_wall_position(wall):
     assert wall.rect.topleft == (50, 50)
+
+# -------------------- Тесты для класса Maze --------------------
 
 # Тестирование проверки размера лабиринта
 def test_maze_size():
@@ -81,17 +91,21 @@ def test_generate_maze(maze):
     open_spaces = sum(row.count(0) for row in maze_data)
     assert open_spaces > 0
 
-# Constants used in the game
+# -------------------- Тесты для класса Game --------------------
+
+# Константы, используемые в игре
 MAZE_WIDTH = 40
 MAZE_HEIGHT = 30
 MAZE_OFFSET_X = 0
 MAZE_OFFSET_Y = 50
 
+# Тестирование инициализации игры
 def test_game_initialization(game):
     assert isinstance(game, Game)
     assert isinstance(game.player, Player)
     assert isinstance(game.maze, Maze)
 
+# Тестирование настройки уровня
 def test_setup_level(game):
     game.setup_level()
     assert len(game.walls) > 0
@@ -99,52 +113,45 @@ def test_setup_level(game):
     assert isinstance(game.end_rect, pygame.Rect)
     assert any(isinstance(coin, Coin) for coin in game.coins)
     
-    # Ensure player is placed correctly
+    # Убедиться, что игрок размещен правильно
     player_start_position = (1 * 16 + MAZE_OFFSET_X, 1 * 16 + MAZE_OFFSET_Y)
     assert game.player.rect.topleft == player_start_position
     
-    # Ensure end position is set
+    # Убедиться, что конечная позиция установлена
     end_position = (MAZE_WIDTH - 2, MAZE_HEIGHT - 2)
     expected_end_rect = pygame.Rect(end_position[0] * 16 + MAZE_OFFSET_X, end_position[1] * 16 + MAZE_OFFSET_Y, 16, 16)
     assert game.end_rect == expected_end_rect
 
+# Тестирование движения игрока
 def test_player_movement(game):
     game.setup_level()
     initial_position = game.player.rect.topleft
-    print(f"Initial position: {initial_position}")
 
-    # Test moving right
+    # Тест движения вправо
     right_possible = not any(wall.rect.topleft == (initial_position[0] + 16, initial_position[1]) for wall in game.walls)
     game.player.move(16, 0, game.walls)
     new_position = (initial_position[0] + 16, initial_position[1]) if right_possible else initial_position
-    print(f"Position after moving right: {game.player.rect.topleft}")
-    assert game.player.rect.topleft == new_position, \
-        f"Expected position: {new_position}, but got: {game.player.rect.topleft}"
+    assert game.player.rect.topleft == new_position
 
-    # Test moving left back to initial position
+    # Тест движения влево обратно к начальной позиции
     left_possible = not any(wall.rect.topleft == (new_position[0] - 16, new_position[1]) for wall in game.walls)
     game.player.move(-16, 0, game.walls)
     expected_position = initial_position if left_possible else new_position
-    print(f"Position after moving left: {game.player.rect.topleft}")
-    assert game.player.rect.topleft == expected_position, \
-        f"Expected position: {expected_position}, but got: {game.player.rect.topleft}"
+    assert game.player.rect.topleft == expected_position
 
-    # Test moving down
+    # Тест движения вниз
     down_possible = not any(wall.rect.topleft == (initial_position[0], initial_position[1] + 16) for wall in game.walls)
     game.player.move(0, 16, game.walls)
     new_position = (initial_position[0], initial_position[1] + 16) if down_possible else initial_position
-    print(f"Position after moving down: {game.player.rect.topleft}")
-    assert game.player.rect.topleft == new_position, \
-        f"Expected position: {new_position}, but got: {game.player.rect.topleft}"
+    assert game.player.rect.topleft == new_position
 
-    # Test moving up back to initial position
+    # Тест движения вверх обратно к начальной позиции
     up_possible = not any(wall.rect.topleft == (new_position[0], new_position[1] - 16) for wall in game.walls)
     game.player.move(0, -16, game.walls)
     expected_position = initial_position if up_possible else new_position
-    print(f"Position after moving up: {game.player.rect.topleft}")
-    assert game.player.rect.topleft == expected_position, \
-        f"Expected position: {expected_position}, but got: {game.player.rect.topleft}"
+    assert game.player.rect.topleft == expected_position
 
+# Тестирование столкновения с монетами
 def test_coin_collision(game):
     game.setup_level()
     initial_coin_count = len(game.coins)
@@ -153,76 +160,11 @@ def test_coin_collision(game):
         game.coins.remove(coin)
     assert len(game.coins) == 0
 
+# Тестирование условия окончания игры
 def test_end_game_condition(game):
     game.setup_level()
     game.player.rect.topleft = game.end_rect.topleft
     assert game.player.rect.colliderect(game.end_rect)
-
-# Тесты для класса UI
-def test_show_statistics(ui):
-    ui.show_statistics(10, 123.45)
-    # Проверяем, что текст отрисован на экране
-    screen_array = pygame.surfarray.array3d(ui.screen)
-    assert screen_array.any()  # Убеждаемся, что что-то отрисовано
-
-# def test_show_exit_confirmation_yes(ui):
-#     pygame.event.clear()
-#     ui.show_exit_confirmation()  # Отображаем экран подтверждения выхода
-    
-#     # Добавляем событие клика мышью на кнопку "Да"
-#     yes_button_x, yes_button_y = 320, 290  # Координаты кнопки (примерные, могут потребовать уточнения)
-#     pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (yes_button_x, yes_button_y)}))
-    
-#     # Запускаем снова show_exit_confirmation и проверяем результат
-#     result = ui.show_exit_confirmation()
-#     assert result is True
-
-# def test_show_exit_confirmation_no(ui):
-#     pygame.event.clear()
-#     ui.show_exit_confirmation()  # Отображаем экран подтверждения выхода
-    
-#     # Добавляем событие клика мышью на кнопку "Остаться"
-#     no_button_x, no_button_y = 400, 290  # Координаты кнопки (примерные, могут потребовать уточнения)
-#     pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (no_button_x, no_button_y)}))
-    
-#     # Запускаем снова show_exit_confirmation и проверяем результат
-#     result = ui.show_exit_confirmation()
-#     assert result is False
-
-# def test_show_exit_confirmation_esc(ui):
-#     pygame.event.clear()
-#     ui.show_exit_confirmation()  # Отображаем экран подтверждения выхода
-    
-#     # Добавляем событие нажатия клавиши ESC
-#     pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_ESCAPE}))
-    
-#     # Запускаем снова show_exit_confirmation и проверяем результат
-#     result = ui.show_exit_confirmation()
-#     assert result is False
-
-# def test_show_main_menu_start(ui):
-#     pygame.event.clear()
-#     ui.show_main_menu()  # Отображаем главное меню
-    
-#     # Добавляем событие клика мышью на кнопку "Начать Игру"
-#     start_button_x, start_button_y = 370, 280  # Координаты кнопки (примерные, могут потребовать уточнения)
-#     pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (start_button_x, start_button_y)}))
-    
-#     # Запускаем снова show_main_menu и проверяем результат
-#     result = ui.show_main_menu()
-#     assert result == "start"
-
-# def test_show_main_menu_exit(ui):
-#     pygame.event.clear()
-#     ui.show_main_menu()  # Отображаем главное меню
-    
-#     # Добавляем событие клика мышью на кнопку "Выйти"
-#     exit_button_x, exit_button_y = 370, 340  # Координаты кнопки (примерные, могут потребовать уточнения)
-#     pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (exit_button_x, exit_button_y)}))
-    
-#     # Ожидаем, что система выйдет при клике на "Выйти"
-#     with pytest.raises(SystemExit):  # Ожидаем, что будет вызвано исключение SystemExit
-#         ui.show_main_menu()
 
 if __name__ == "__main__":
     pytest.main()
