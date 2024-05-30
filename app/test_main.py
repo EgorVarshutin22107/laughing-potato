@@ -47,6 +47,15 @@ def game():
     yield game
     pygame.quit()
 
+@pytest.fixture(scope="module")
+def setup_pygame():
+    pygame.init()
+    screen = pygame.display.set_mode((800, 600))
+    font = pygame.font.SysFont(None, 36)
+    ui = UI(screen, font)
+    yield ui
+    pygame.quit()
+
 # -------------------- Тесты для класса Player --------------------
 
 # Тестирование движения игрока без столкновения с препятствиями
@@ -175,62 +184,34 @@ def test_end_game_condition(game):
     game.player.rect.topleft = game.end_rect.topleft
     assert game.player.rect.colliderect(game.end_rect)
 
+# -------------------- Тесты для функции класса UI --------------------------
+# def test_show_statistics(setup_pygame):
+#     ui = setup_pygame
+#     coin_count = 10
+#     elapsed_time = 123.45
+#     ui.show_statistics(coin_count, elapsed_time)
+#     # Проверить отрисовку на экране невозможно, но можно проверить отсутствие ошибок
+
+# def test_show_exit_confirmation(setup_pygame):
+#     ui = setup_pygame
+#     pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (ui.screen.get_width() // 2 - 60, ui.screen.get_height() // 2 + 20)}))
+#     assert ui.show_exit_confirmation() is True
+
+#     pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (ui.screen.get_width() // 2 + 60, ui.screen.get_height() // 2 + 20)}))
+#     assert ui.show_exit_confirmation() is False
+    
+# def test_show_main_menu_start(setup_pygame):
+#     ui = setup_pygame
+#     pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (ui.screen.get_width() // 2, ui.screen.get_height() // 2 - 20)}))
+#     assert ui.show_main_menu() == "start"
+
+# def test_show_main_menu_exit(setup_pygame):
+#     ui = setup_pygame
+#     with pytest.raises(SystemExit):
+#         pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (ui.screen.get_width() // 2, ui.screen.get_height() // 2 + 40)}))
+#         ui.show_main_menu()
+
 # -------------------- Тесты для функции run класса Game --------------------
-
-# Тестирование функции run
-
-# def simulate_key_press(game, key, duration=100):
-#     start_ticks = pygame.time.get_ticks()
-#     while pygame.time.get_ticks() - start_ticks < duration:
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 return
-#         pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=key))
-#         game.run()
-#         pygame.event.post(pygame.event.Event(pygame.KEYUP, key=key))
-
-# def simulate_mouse_click(game, position):
-#     pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=position))
-#     pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONUP, button=1, pos=position))
-#     game.run()
-
-# def test_run_gameplay(game):
-#     # Simulate clicking on the "Начать Игру" button
-#     start_button_position = (game.screen.get_width() // 2, game.screen.get_height() // 2 - 20)
-#     simulate_mouse_click(game, start_button_position)
-    
-#     # Simulate right arrow key press
-#     simulate_key_press(game, pygame.K_RIGHT, duration=100)
-    
-#     # Check if the player's position has been updated correctly
-#     assert game.player.rect.x > 32
-
-# def test_run_exit_confirmation(game):
-#     # Simulate clicking on the "Начать Игру" button
-#     start_button_position = (game.screen.get_width() // 2, game.screen.get_height() // 2 - 20)
-#     simulate_mouse_click(game, start_button_position)
-    
-#     # Simulate backquote key press to trigger exit confirmation
-#     simulate_key_press(game, pygame.K_BACKQUOTE, duration=100)
-    
-#     # Check if the exit confirmation was shown
-#     assert game.ui.show_exit_confirmation.called
-
-# def test_coin_collection(game):
-#     # Simulate clicking on the "Начать Игру" button
-#     start_button_position = (game.screen.get_width() // 2, game.screen.get_height() // 2 - 20)
-#     simulate_mouse_click(game, start_button_position)
-
-#     # Set a coin directly in front of the player
-#     coin_position = (game.player.rect.x + 16, game.player.rect.y)
-#     game.coins = [Coin(coin_position)]
-
-#     # Simulate right arrow key press to collect coin
-#     simulate_key_press(game, pygame.K_RIGHT, duration=100)
-
-#     # Check if the coin was collected
-#     assert game.coin_count == 1
-#     assert len(game.coins) == 0
 
 
 
