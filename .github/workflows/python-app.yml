@@ -21,6 +21,7 @@ jobs:
 
     - name: Run tests with coverage
       run: |
+          pip install coverage coveralls
           coverage run -m pytest
           coverage xml -o coverage.xml
 
