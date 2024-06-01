@@ -27,7 +27,7 @@ jobs:
           pip install tox
 
       - name: Run Tests with Coverage
-        run: tox
+        run: tox -e py
 
       - name: Upload Coverage to SonarQube
         uses: SonarSource/sonarqube-scan-action@master
