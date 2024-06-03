@@ -35,8 +35,8 @@ def game():
 @pytest.fixture
 def ui():
     pygame.init()
-    screen = pygame.display.set_mode((740, 580))
-    font = pygame.font.SysFont(None, 36)
+    screen = Mock()
+    font = Mock()
     return UI(screen, font)
 
 @pytest.fixture
@@ -184,35 +184,62 @@ def test_end_game_condition(game):
     game.player.rect.topleft = game.end_rect.topleft
     assert game.player.rect.colliderect(game.end_rect)
 
-# -------------------- Тесты для функции класса UI --------------------------
-# def test_show_statistics(setup_pygame):
-#     ui = setup_pygame
-#     coin_count = 10
-#     elapsed_time = 123.45
-#     ui.show_statistics(coin_count, elapsed_time)
-#     # Проверить отрисовку на экране невозможно, но можно проверить отсутствие ошибок
+# -------------------- Тесты для класса UI (Заглушки) ------------------
+def test_show_statistics(ui):
+    ui.screen.fill = Mock()
+    text_mock = Mock()
+    text_mock.get_width.return_value = 100
+    text_mock.get_height.return_value = 20
+    ui.font.render = Mock(return_value=text_mock)
+    ui.screen.blit = Mock()
+    pygame.display.flip = Mock()
+    pygame.time.wait = Mock()
 
-# def test_show_exit_confirmation(setup_pygame):
-#     ui = setup_pygame
-#     pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (ui.screen.get_width() // 2 - 60, ui.screen.get_height() // 2 + 20)}))
-#     assert ui.show_exit_confirmation() is True
+    ui.show_statistics(10, 15.2)
 
-#     pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (ui.screen.get_width() // 2 + 60, ui.screen.get_height() // 2 + 20)}))
-#     assert ui.show_exit_confirmation() is False
-    
-# def test_show_main_menu_start(setup_pygame):
-#     ui = setup_pygame
-#     pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (ui.screen.get_width() // 2, ui.screen.get_height() // 2 - 20)}))
-#     assert ui.show_main_menu() == "start"
+    ui.screen.fill.assert_called_with((0, 0, 0))
+    assert ui.font.render.call_count == 2
+    ui.screen.blit.assert_called()
+    pygame.display.flip.assert_called()
+    pygame.time.wait.assert_called_with(3000)
 
-# def test_show_main_menu_exit(setup_pygame):
-#     ui = setup_pygame
-#     with pytest.raises(SystemExit):
-#         pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1, 'pos': (ui.screen.get_width() // 2, ui.screen.get_height() // 2 + 40)}))
-#         ui.show_main_menu()
+def test_show_exit_confirmation(ui):
+    ui.screen.fill = Mock()
+    text_mock = Mock()
+    text_mock.get_width.return_value = 100
+    text_mock.get_height.return_value = 20
+    ui.font.render = Mock(return_value=text_mock)
+    ui.screen.blit = Mock()
+    pygame.display.flip = Mock()
 
-# -------------------- Тесты для функции run класса Game --------------------
+    # Mocking the event loop
+    with patch('pygame.event.get', return_value=[Mock(type=pygame.QUIT)]):
+        result = ui.show_exit_confirmation()
 
+    assert result is False
+    ui.screen.fill.assert_called_with((0, 0, 0))
+    assert ui.font.render.call_count == 3
+    ui.screen.blit.assert_called()
+    pygame.display.flip.assert_called()
+
+def test_show_main_menu(ui):
+    ui.screen.fill = Mock()
+    text_mock = Mock()
+    text_mock.get_width.return_value = 100
+    text_mock.get_height.return_value = 20
+    ui.font.render = Mock(return_value=text_mock)
+    ui.screen.blit = Mock()
+    pygame.display.flip = Mock()
+
+    # Mocking the event loop
+    with patch('pygame.event.get', return_value=[Mock(type=pygame.QUIT)]):
+        with pytest.raises(SystemExit):
+            ui.show_main_menu()
+
+    ui.screen.fill.assert_called_with((0, 0, 0))
+    assert ui.font.render.call_count == 3
+    ui.screen.blit.assert_called()
+    pygame.display.flip.assert_called()
 
 
 if __name__ == "__main__":
