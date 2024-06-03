@@ -125,6 +125,13 @@ def test_generate_maze(maze):
     open_spaces = sum(row.count(0) for row in maze_data)
     assert open_spaces > 0
 
+# Тестирование проверки корректного размера лабиринта
+def test_invalid_maze_size():
+    with pytest.raises(ValueError, match="Invalid maze size"):
+        Maze(-1, 5)
+    with pytest.raises(ValueError, match="Invalid maze size"):
+        Maze(5, -1)
+
 # -------------------- Тесты для класса Game --------------------
 
 # Константы, используемые в игре
@@ -257,42 +264,6 @@ def test_show_exit_confirmation_escape(ui):
     ui.screen.blit.assert_called()
     pygame.display.flip.assert_called()
 
-# def test_show_exit_confirmation_no_click(ui):
-#     # Define screen dimensions (use the same dimensions as in your main code)
-#     screen_width = 740  # Replace with actual screen width
-#     screen_height = 580  # Replace with actual screen height
-    
-#     confirm_text_mock = Mock()
-#     confirm_text_mock.get_width.return_value = 200
-#     confirm_text_mock.get_height.return_value = 40
-#     yes_text_mock = Mock()
-#     yes_text_mock.get_width.return_value = 100
-#     yes_text_mock.get_height.return_value = 20
-#     no_text_mock = Mock()
-#     no_text_mock.get_width.return_value = 100
-#     no_text_mock.get_height.return_value = 20
-
-#     ui.font.render.side_effect = [confirm_text_mock, yes_text_mock, no_text_mock]
-
-#     # The "Остаться" (No) button is at (screen_width // 2 + 60, screen_height // 2 + 20)
-#     # Calculate the center coordinates of the "Остаться" button
-#     no_button_x = screen_width // 2 + 60
-#     no_button_y = screen_height // 2 + 20
-#     no_button_width = no_text_mock.get_width()
-#     no_button_height = no_text_mock.get_height()
-
-#     # Ensure the click is within the "Остаться" button's area
-#     no_button_click_pos = (no_button_x, no_button_y)
-#     no_button_rect = pygame.Rect(no_button_x - no_button_width // 2, no_button_y - no_button_height // 2, no_button_width, no_button_height)
-
-#     print(f"Testing 'Остаться' button at {no_button_rect}, clicking at {no_button_click_pos}")
-
-#     with patch('pygame.event.get', return_value=[Mock(type=pygame.MOUSEBUTTONDOWN, button=1, pos=(no_button_click_pos))]):
-#         result = ui.show_exit_confirmation()
-    
-#     print(f"Result: {result}")
-#     assert result is False
-
 def test_show_exit_confirmation_yes_click(ui):
     # Define screen dimensions (use the same dimensions as in your main code)
     screen_width = 740  # Replace with actual screen width
@@ -328,7 +299,6 @@ def test_show_exit_confirmation_yes_click(ui):
     
     print(f"Result: {result}")
     assert result is True
-
 
 def test_show_main_menu(ui):
     ui.screen.fill = Mock()
