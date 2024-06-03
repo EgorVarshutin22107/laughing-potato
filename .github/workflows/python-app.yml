@@ -25,9 +25,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install tox
+          pip install coveralls
 
       - name: Run Tests with Coverage
-        run: tox -e py
+        run: tox -e py -- --cov=YOUR_PACKAGE_NAME
+
+      - name: Upload Coverage to Coveralls
+        run: coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
       - name: Upload Coverage to SonarQube
         uses: SonarSource/sonarqube-scan-action@master
