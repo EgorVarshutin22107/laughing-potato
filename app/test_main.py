@@ -28,8 +28,8 @@ def maze():
 # Фикстура для создания экземпляра игры для тестирования
 @pytest.fixture
 def game():
+    """Фикстура для создания экземпляра игры."""
     game_instance = Game()
-    game_instance.setup_level()
     return game_instance
 
 @pytest.fixture
@@ -73,6 +73,22 @@ def test_player_move_with_collision(player, wall):
     # Перемещаем игрока вправо на 16 пикселей, что вызывает столкновение со стеной
     player.move(16, 0, [wall])
     assert player.rect.right == wall.rect.left  # Проверяем корректное столкновение
+
+    # Тест движения влево с столкновением
+    player.rect.topleft = (66, 32)  # Начальная позиция игрока
+    player.move(-16, 0, [wall])
+    assert player.rect.left == wall.rect.right  # Проверяем корректное столкновение
+
+    # Тест движения вниз с столкновением
+    wall.rect.topleft = (50, 50)  # Убедитесь, что стена находится на ожидаемой позиции
+    player.rect.topleft = (50, 34)  # Начальная позиция игрока
+    player.move(0, 16, [wall])
+    assert player.rect.bottom == wall.rect.top  # Проверяем корректное столкновение
+
+    # Тест движения вверх с столкновением
+    player.rect.topleft = (50, 66)  # Начальная позиция игрока
+    player.move(0, -16, [wall])
+    assert player.rect.top == wall.rect.bottom  # Проверяем корректное столкновение
 
 # -------------------- Тесты для класса Coin --------------------
 
@@ -185,6 +201,7 @@ def test_end_game_condition(game):
     assert game.player.rect.colliderect(game.end_rect)
 
 # -------------------- Тесты для класса UI (Заглушки) ------------------
+
 def test_show_statistics(ui):
     ui.screen.fill = Mock()
     text_mock = Mock()
@@ -212,7 +229,7 @@ def test_show_exit_confirmation(ui):
     ui.screen.blit = Mock()
     pygame.display.flip = Mock()
 
-    # Mocking the event loop
+    # Имитация цикла событий
     with patch('pygame.event.get', return_value=[Mock(type=pygame.QUIT)]):
         result = ui.show_exit_confirmation()
 
@@ -221,6 +238,97 @@ def test_show_exit_confirmation(ui):
     assert ui.font.render.call_count == 3
     ui.screen.blit.assert_called()
     pygame.display.flip.assert_called()
+
+def test_show_exit_confirmation_escape(ui):
+    ui.screen.fill = Mock()
+    text_mock = Mock()
+    text_mock.get_width.return_value = 100
+    text_mock.get_height.return_value = 20
+    ui.font.render = Mock(return_value=text_mock)
+    ui.screen.blit = Mock()
+    pygame.display.flip = Mock()
+
+    event = Mock(type=pygame.KEYDOWN, key=pygame.K_ESCAPE)
+    with patch('pygame.event.get', return_value=[event]):
+        result = ui.show_exit_confirmation()
+    assert result is False
+    ui.screen.fill.assert_called_with((0, 0, 0))
+    assert ui.font.render.call_count == 3
+    ui.screen.blit.assert_called()
+    pygame.display.flip.assert_called()
+
+# def test_show_exit_confirmation_no_click(ui):
+#     # Define screen dimensions (use the same dimensions as in your main code)
+#     screen_width = 740  # Replace with actual screen width
+#     screen_height = 580  # Replace with actual screen height
+    
+#     confirm_text_mock = Mock()
+#     confirm_text_mock.get_width.return_value = 200
+#     confirm_text_mock.get_height.return_value = 40
+#     yes_text_mock = Mock()
+#     yes_text_mock.get_width.return_value = 100
+#     yes_text_mock.get_height.return_value = 20
+#     no_text_mock = Mock()
+#     no_text_mock.get_width.return_value = 100
+#     no_text_mock.get_height.return_value = 20
+
+#     ui.font.render.side_effect = [confirm_text_mock, yes_text_mock, no_text_mock]
+
+#     # The "Остаться" (No) button is at (screen_width // 2 + 60, screen_height // 2 + 20)
+#     # Calculate the center coordinates of the "Остаться" button
+#     no_button_x = screen_width // 2 + 60
+#     no_button_y = screen_height // 2 + 20
+#     no_button_width = no_text_mock.get_width()
+#     no_button_height = no_text_mock.get_height()
+
+#     # Ensure the click is within the "Остаться" button's area
+#     no_button_click_pos = (no_button_x, no_button_y)
+#     no_button_rect = pygame.Rect(no_button_x - no_button_width // 2, no_button_y - no_button_height // 2, no_button_width, no_button_height)
+
+#     print(f"Testing 'Остаться' button at {no_button_rect}, clicking at {no_button_click_pos}")
+
+#     with patch('pygame.event.get', return_value=[Mock(type=pygame.MOUSEBUTTONDOWN, button=1, pos=(no_button_click_pos))]):
+#         result = ui.show_exit_confirmation()
+    
+#     print(f"Result: {result}")
+#     assert result is False
+
+def test_show_exit_confirmation_yes_click(ui):
+    # Define screen dimensions (use the same dimensions as in your main code)
+    screen_width = 740  # Replace with actual screen width
+    screen_height = 580  # Replace with actual screen height
+    
+    confirm_text_mock = Mock()
+    confirm_text_mock.get_width.return_value = 200
+    confirm_text_mock.get_height.return_value = 40
+    yes_text_mock = Mock()
+    yes_text_mock.get_width.return_value = 100
+    yes_text_mock.get_height.return_value = 20
+    no_text_mock = Mock()
+    no_text_mock.get_width.return_value = 100
+    no_text_mock.get_height.return_value = 20
+
+    ui.font.render.side_effect = [confirm_text_mock, yes_text_mock, no_text_mock]
+
+    # The "Да" (Yes) button is at (screen_width // 2 - 60, screen_height // 2 + 20)
+    # Calculate the center coordinates of the "Да" button
+    yes_button_x = screen_width // 2 - 60
+    yes_button_y = screen_height // 2 + 20
+    yes_button_width = yes_text_mock.get_width()
+    yes_button_height = yes_text_mock.get_height()
+
+    # Ensure the click is within the "Да" button's area
+    yes_button_click_pos = (yes_button_x, yes_button_y)
+    yes_button_rect = pygame.Rect(yes_button_x - yes_button_width // 2, yes_button_y - yes_button_height // 2, yes_button_width, yes_button_height)
+
+    print(f"Testing 'Да' button at {yes_button_rect}, clicking at {yes_button_click_pos}")
+
+    with patch('pygame.event.get', return_value=[Mock(type=pygame.MOUSEBUTTONDOWN, button=1, pos=(yes_button_click_pos))]):
+        result = ui.show_exit_confirmation()
+    
+    print(f"Result: {result}")
+    assert result is True
+
 
 def test_show_main_menu(ui):
     ui.screen.fill = Mock()
@@ -231,7 +339,7 @@ def test_show_main_menu(ui):
     ui.screen.blit = Mock()
     pygame.display.flip = Mock()
 
-    # Mocking the event loop
+    # Имитация цикла событий
     with patch('pygame.event.get', return_value=[Mock(type=pygame.QUIT)]):
         with pytest.raises(SystemExit):
             ui.show_main_menu()
@@ -240,7 +348,6 @@ def test_show_main_menu(ui):
     assert ui.font.render.call_count == 3
     ui.screen.blit.assert_called()
     pygame.display.flip.assert_called()
-
 
 if __name__ == "__main__":
     pytest.main()
